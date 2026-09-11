@@ -1,0 +1,158 @@
+.innovation {
+  text-align: center;
+  padding: var(--space-4xl) 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.innovation__content {
+  max-width: 700px;
+  margin: 0 auto;
+  margin-bottom: var(--space-3xl);
+}
+
+.innovation__headline {
+  margin-top: var(--space-md);
+  margin-bottom: var(--space-md);
+  color: var(--text-primary);
+}
+
+.innovation__text {
+  font-size: 1.2rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+/* Animated Line */
+.innovation__line-wrapper {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 var(--space-xl);
+}
+
+.innovation__line {
+  height: 2px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    var(--accent) 20%,
+    var(--accent) 80%,
+    transparent 100%
+  );
+  opacity: 0.4;
+  border-radius: 1px;
+  position: relative;
+  overflow: visible;
+}
+
+.innovation__particle {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 16px var(--accent-glow-strong),
+              0 0 40px var(--accent-glow);
+  animation: travel-particle 3s ease-in-out infinite;
+}
+
+@keyframes travel-particle {
+  0% {
+    left: -12px;
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    left: calc(100% + 12px);
+    opacity: 0;
+  }
+}
+
+/* Particle trail glow */
+.innovation__particle::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 100%;
+  transform: translateY(-50%);
+  width: 60px;
+  height: 2px;
+  background: linear-gradient(270deg, var(--accent), transparent);
+  opacity: 0.6;
+}
+
+/* 3-Column Innovation Pillars (Slide 2 Alignment) */
+.innovation__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-lg);
+  margin-top: var(--space-3xl);
+  text-align: left;
+}
+
+.innovation__card {
+  padding: var(--space-xl);
+  background: var(--bg-glass);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-subtle);
+  position: relative;
+  transition: all var(--transition-base);
+}
+
+.innovation__card:hover {
+  border-color: var(--accent);
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-glow);
+}
+
+.innovation__card-badge {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+  background: var(--accent-subtle);
+  padding: 3px 8px;
+  border-radius: 4px;
+  margin-bottom: var(--space-sm);
+}
+
+.innovation__card-formula {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: #FBBF24;
+  background: rgba(251, 191, 36, 0.08);
+  padding: 6px 10px;
+  border-radius: 6px;
+  margin: var(--space-sm) 0 var(--space-md);
+  line-height: 1.4;
+  border-left: 2px solid #FBBF24;
+}
+
+.innovation__card-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--space-xs);
+}
+
+.innovation__card-desc {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+@media (max-width: 900px) {
+  .innovation__grid {
+    grid-template-columns: 1fr;
+  }
+}
+

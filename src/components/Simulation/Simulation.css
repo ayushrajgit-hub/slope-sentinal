@@ -1,0 +1,1041 @@
+.simulation {
+  position: relative;
+}
+
+.simulation__header {
+  text-align: center;
+  margin-bottom: var(--space-3xl);
+}
+
+.simulation__header h2 {
+  margin-top: var(--space-md);
+  margin-bottom: var(--space-md);
+}
+
+.simulation__subtitle {
+  max-width: 600px;
+  margin: 0 auto;
+  color: var(--text-secondary);
+}
+
+/* 50/50 Split Layout — Controls Left, Map Right */
+.simulation__split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-lg);
+  align-items: start;
+}
+
+/* Left Column: Scrollable Controls */
+.simulation__controls {
+  min-width: 0;
+}
+
+/* Right Column: Sticky Pinned Map */
+.simulation__map {
+  position: sticky;
+  top: 80px;
+  height: calc(100vh - 100px);
+  min-height: 600px;
+}
+
+.simulation__map .gis-map {
+  height: 100%;
+}
+
+/* Control Panel */
+.control-panel {
+  background: var(--bg-glass);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--bg-glass-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.control-panel__header h3 {
+  font-size: 1.1rem;
+  margin-bottom: var(--space-xs);
+}
+
+.control-panel__subtitle {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* ═══════════════════════════════════════════════════════
+   ENGINE TOGGLE
+   ═══════════════════════════════════════════════════════ */
+.engine-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+
+.engine-toggle__label {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.engine-toggle__switch {
+  display: flex;
+  gap: 3px;
+  background: rgba(0, 0, 0, 0.35);
+  padding: 3px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-subtle);
+}
+
+.engine-toggle__btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border: none;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.engine-toggle__btn:hover {
+  color: var(--text-primary);
+}
+
+.engine-toggle__btn--active {
+  background: var(--accent);
+  color: #040914;
+  font-weight: 700;
+  box-shadow: 0 0 14px var(--accent-glow), 0 0 4px var(--accent);
+}
+
+.engine-toggle__btn--legacy.engine-toggle__btn--active {
+  background: #FBBF24;
+  box-shadow: 0 0 14px rgba(251, 191, 36, 0.4), 0 0 4px #FBBF24;
+}
+
+.engine-toggle__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+/* ═══════════════════════════════════════════════════════
+   STAGE CARDS
+   ═══════════════════════════════════════════════════════ */
+.stage-card {
+  position: relative;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--border-accent);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+  padding-top: var(--space-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.stage-card--stage2 {
+  border-left-color: #FBBF24;
+}
+
+.stage-card--legacy {
+  border-left-color: var(--text-muted);
+}
+
+.stage-card__number {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  font-family: var(--font-mono);
+  font-size: 1.8rem;
+  font-weight: 900;
+  color: rgba(0, 240, 255, 0.08);
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
+}
+
+.stage-card--stage2 .stage-card__number {
+  color: rgba(251, 191, 36, 0.08);
+}
+
+.stage-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.stage-card__title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+/* ═══════════════════════════════════════════════════════
+   PROCESSING BADGES
+   ═══════════════════════════════════════════════════════ */
+.processing-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  background: rgba(0, 240, 255, 0.08);
+  border: 1px solid rgba(0, 240, 255, 0.25);
+  border-radius: var(--radius-full);
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  font-weight: 600;
+  color: var(--accent);
+  letter-spacing: 0.03em;
+}
+
+.processing-badge--amber {
+  background: rgba(251, 191, 36, 0.08);
+  border-color: rgba(251, 191, 36, 0.25);
+  color: #FBBF24;
+}
+
+.processing-badge--dim {
+  background: rgba(100, 116, 139, 0.08);
+  border-color: rgba(100, 116, 139, 0.25);
+  color: var(--text-muted);
+}
+
+.processing-badge__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: processingPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes processingPulse {
+  0%, 100% {
+    opacity: 0.4;
+    box-shadow: 0 0 4px currentColor;
+  }
+  50% {
+    opacity: 1;
+    box-shadow: 0 0 10px currentColor, 0 0 20px currentColor;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   PREDICTED RAINFALL OUTPUT ROW
+   ═══════════════════════════════════════════════════════ */
+.predicted-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding-top: var(--space-sm);
+  border-top: 1px solid var(--border-subtle);
+}
+
+.predicted-row__label {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.predicted-row__chips {
+  display: flex;
+  gap: 8px;
+}
+
+.horizon-chip {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 6px;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  transition: all 0.3s ease;
+}
+
+.horizon-chip--primary {
+  border-color: var(--accent);
+  background: rgba(0, 240, 255, 0.06);
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.1);
+}
+
+.horizon-chip__label {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+}
+
+.horizon-chip__value {
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--accent);
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+}
+
+.horizon-chip--primary .horizon-chip__value {
+  text-shadow: 0 0 10px var(--accent-glow);
+}
+
+.horizon-chip__value small {
+  font-size: 0.55rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+/* ═══════════════════════════════════════════════════════
+   STAGE CONNECTOR
+   ═══════════════════════════════════════════════════════ */
+.stage-connector {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: var(--space-xs) 0;
+}
+
+.stage-connector__line {
+  flex: 1;
+  height: 1px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--accent) 0,
+    var(--accent) 4px,
+    transparent 4px,
+    transparent 8px
+  );
+  opacity: 0.4;
+}
+
+.stage-connector__label {
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0.1em;
+  opacity: 0.7;
+  animation: connectorPulse 2s ease-in-out infinite;
+}
+
+@keyframes connectorPulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+/* ═══════════════════════════════════════════════════════
+   AUTO-BIND READOUT (Stage 2 rainfall input)
+   ═══════════════════════════════════════════════════════ */
+.auto-bind-readout {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: rgba(0, 240, 255, 0.04);
+  border: 1px dashed rgba(0, 240, 255, 0.3);
+  border-radius: var(--radius-sm);
+}
+
+.auto-bind-readout__label {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.auto-bind-readout__value {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: var(--accent);
+}
+
+.auto-bind-readout__value small {
+  font-size: 0.6rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  margin-left: 4px;
+}
+
+/* ═══════════════════════════════════════════════════════
+   GREEN NDVI SLIDER VARIANT
+   ═══════════════════════════════════════════════════════ */
+.slider--green::-webkit-slider-thumb {
+  background: #22C55E;
+  box-shadow: 0 0 12px rgba(34, 197, 94, 0.5), 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.slider--green::-webkit-slider-thumb:hover {
+  box-shadow: 0 0 18px rgba(34, 197, 94, 0.7), 0 2px 12px rgba(0, 0, 0, 0.4);
+}
+
+.slider--green::-moz-range-thumb {
+  background: #22C55E;
+  box-shadow: 0 0 12px rgba(34, 197, 94, 0.5);
+}
+
+/* ═══════════════════════════════════════════════════════
+   RED DEFORESTATION SLIDER VARIANT
+   ═══════════════════════════════════════════════════════ */
+.slider--red::-webkit-slider-thumb {
+  background: #EF4444;
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.5), 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.slider--red::-webkit-slider-thumb:hover {
+  box-shadow: 0 0 18px rgba(239, 68, 68, 0.7), 0 2px 12px rgba(0, 0, 0, 0.4);
+}
+
+.slider--red::-moz-range-thumb {
+  background: #EF4444;
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.5);
+}
+
+/* Historical data readout */
+.auto-bind-readout--historical {
+  background: rgba(245, 158, 11, 0.06);
+  border-color: rgba(245, 158, 11, 0.3);
+  margin-top: var(--space-xs);
+}
+
+.auto-bind-readout--historical .auto-bind-readout__value {
+  color: #F59E0B;
+}
+
+/* Slider tooltip (Forest & Environment Dept) */
+.slider-group__tooltip {
+  margin-top: 6px;
+  padding: 6px 10px;
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  background: rgba(34, 197, 94, 0.06);
+  border-left: 2px solid rgba(34, 197, 94, 0.4);
+  border-radius: 0 var(--radius-xs) var(--radius-xs) 0;
+  line-height: 1.4;
+}
+
+.slider-group__tooltip strong {
+  color: #22C55E;
+  font-weight: 700;
+}
+
+/* ═══════════════════════════════════════════════════════
+   SLIDERS (shared)
+   ═══════════════════════════════════════════════════════ */
+.control-panel__sliders {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.slider-group__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: var(--space-sm);
+}
+
+.slider-group__label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.slider-group__value {
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.slider-group__value small {
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  margin-left: 2px;
+}
+
+/* Custom Slider */
+.slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--bg-surface);
+  outline: none;
+  cursor: pointer;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 12px var(--accent-glow), 0 2px 8px rgba(0, 0, 0, 0.3);
+  cursor: grab;
+  transition: box-shadow var(--transition-fast);
+}
+
+.slider::-webkit-slider-thumb:hover {
+  box-shadow: var(--shadow-glow-strong), 0 2px 12px rgba(0, 0, 0, 0.4);
+}
+
+.slider::-webkit-slider-thumb:active {
+  cursor: grabbing;
+  transform: scale(1.1);
+}
+
+.slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 12px var(--accent-glow);
+  cursor: grab;
+  border: none;
+}
+
+.slider-group__ticks {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 4px;
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+/* ═══════════════════════════════════════════════════════
+   GAUGE
+   ═══════════════════════════════════════════════════════ */
+.control-panel__gauge {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-sm) 0;
+}
+
+.risk-gauge {
+  text-align: center;
+}
+
+.risk-gauge__svg {
+  width: 200px;
+  height: auto;
+}
+
+.risk-gauge__label {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  margin-top: -4px;
+  transition: color 0.6s ease;
+}
+
+/* ═══════════════════════════════════════════════════════
+   SYSTEM LOG
+   ═══════════════════════════════════════════════════════ */
+.system-log {
+  flex: 1;
+  min-height: 140px;
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--border-subtle);
+}
+
+.system-log__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: 8px 12px;
+  background: rgba(0, 0, 0, 0.3);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.system-log__dots {
+  display: flex;
+  gap: 5px;
+}
+
+.system-log__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.system-log__dot--red { background: #EF4444; }
+.system-log__dot--yellow { background: #FBBF24; }
+.system-log__dot--green { background: #22C55E; }
+
+.system-log__title {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.system-log__body {
+  flex: 1;
+  padding: var(--space-sm);
+  background: rgba(0, 0, 0, 0.2);
+  overflow-y: auto;
+  max-height: 160px;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  line-height: 1.8;
+}
+
+.system-log__line {
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.system-log__line--muted { color: var(--text-muted); }
+.system-log__line--warning { color: var(--risk-moderate); }
+.system-log__line--critical { color: var(--risk-critical); }
+.system-log__line--success { color: var(--risk-low); }
+
+.system-log__timestamp {
+  color: var(--text-muted);
+  margin-right: 6px;
+}
+
+.system-log__prompt {
+  color: var(--accent);
+  margin-right: 6px;
+}
+
+/* ═══════════════════════════════════════════════════════
+   GIS MAP
+   ═══════════════════════════════════════════════════════ */
+.gis-map {
+  position: relative;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid rgba(0, 240, 255, 0.35);
+  box-shadow: 
+    0 0 25px rgba(0, 240, 255, 0.16),
+    0 0 55px rgba(0, 240, 255, 0.06),
+    0 12px 40px rgba(0, 0, 0, 0.6);
+  min-height: 500px;
+  height: 100%;
+  background: radial-gradient(circle at center, #0B1E38 0%, #060B18 65%, #02040A 100%);
+  transition: border-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+.gis-map--critical {
+  border-color: rgba(255, 42, 85, 0.65) !important;
+  box-shadow: 
+    0 0 35px rgba(255, 42, 85, 0.35),
+    0 0 70px rgba(255, 42, 85, 0.15),
+    0 12px 40px rgba(0, 0, 0, 0.7) !important;
+}
+
+.gis-map::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at center, transparent 45%, rgba(4, 9, 20, 0.4) 100%);
+  box-shadow: inset 0 0 45px rgba(0, 240, 255, 0.1);
+  border-radius: inherit;
+  z-index: 500;
+}
+
+.gis-map .leaflet-container {
+  height: 100%;
+  width: 100%;
+  background: radial-gradient(circle at center, #0B1E38 0%, #060B18 65%, #02040A 100%) !important;
+  font-family: var(--font-sans);
+}
+
+.gis-map .leaflet-tile {
+  filter: brightness(0.78) contrast(1.18) saturate(0.92);
+  transition: filter 0.3s ease;
+}
+
+.gis-map__container {
+  height: 100%;
+  width: 100%;
+  background: #060B18 !important;
+  animation: mapEntrance 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes mapEntrance {
+  0% {
+    opacity: 0.3;
+    transform: scale(1.06);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.gis-map__view-switch {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 1000;
+  display: flex;
+  gap: 4px;
+  background: rgba(11, 17, 32, 0.85);
+  backdrop-filter: blur(8px);
+  padding: 3px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+}
+
+.gis-map__switch-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 4px 9px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.gis-map__switch-btn:hover {
+  color: var(--text-primary);
+}
+
+.gis-map__switch-btn--active {
+  background: var(--accent);
+  color: #040914;
+  font-weight: 700;
+  box-shadow: 0 0 10px var(--accent-glow);
+}
+
+.gis-map__overlay-info {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 1000;
+  display: flex;
+  gap: 8px;
+}
+
+.gis-map__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  background: rgba(6, 12, 24, 0.88);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 240, 255, 0.32);
+  box-shadow: 0 0 14px rgba(0, 240, 255, 0.15);
+  border-radius: var(--radius-full);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: 0.04em;
+}
+
+.gis-map__badge--risk {
+  border-color: var(--accent);
+  box-shadow: 0 0 16px currentColor;
+  transition: all var(--transition-base);
+}
+
+/* ═══════════════════════════════════════════════════════
+   CAP v1.2 ALERT BADGES
+   ═══════════════════════════════════════════════════════ */
+.cap-alert-row {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  right: 12px;
+  z-index: 1000;
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  animation: capFadeIn 0.4s ease-out;
+}
+
+@keyframes capFadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.cap-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: rgba(239, 68, 68, 0.12);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(239, 68, 68, 0.5);
+  border-radius: var(--radius-full);
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: #EF4444;
+  letter-spacing: 0.04em;
+  animation: capPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes capPulse {
+  0%, 100% {
+    box-shadow: 0 0 6px rgba(239, 68, 68, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 18px rgba(239, 68, 68, 0.5), 0 0 30px rgba(239, 68, 68, 0.2);
+  }
+}
+
+.cap-badge__icon {
+  font-size: 0.85rem;
+}
+
+/* ═══════════════════════════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════════════════════════ */
+@media (max-width: 1024px) {
+  .simulation__split {
+    grid-template-columns: 1fr;
+  }
+
+  .simulation__map {
+    position: relative;
+    top: auto;
+    height: 450px;
+    min-height: 400px;
+  }
+}
+
+@media (max-width: 768px) {
+  .control-panel {
+    padding: var(--space-lg);
+  }
+
+  .simulation__map {
+    height: 350px;
+    min-height: 300px;
+  }
+
+  .engine-toggle {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .predicted-row__chips {
+    flex-wrap: wrap;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   MAP GLOW & VECTOR OVERLAYS (HIGH-TECH TACTICAL HUD)
+   ═══════════════════════════════════════════════════════ */
+/* Highway Corridor Multi-Layer Glow */
+.corridor-glow-wide {
+  filter: drop-shadow(0 0 10px currentColor) drop-shadow(0 0 20px currentColor);
+  animation: corridorPulseWide 3s ease-in-out infinite alternate;
+}
+
+.corridor-glow-mid {
+  filter: drop-shadow(0 0 6px currentColor) drop-shadow(0 0 12px currentColor);
+}
+
+.corridor-glow-core {
+  filter: drop-shadow(0 0 5px currentColor);
+}
+
+.corridor-pulse-beam {
+  filter: drop-shadow(0 0 4px #FFFFFF) drop-shadow(0 0 8px rgba(0, 240, 255, 0.9));
+  animation: corridorFlow 1.6s linear infinite;
+}
+
+@keyframes corridorPulseWide {
+  0% { opacity: 0.22; }
+  100% { opacity: 0.42; }
+}
+
+@keyframes corridorFlow {
+  to {
+    stroke-dashoffset: -28;
+  }
+}
+
+/* Primary Sensor Stations */
+.sensor-station-core {
+  filter: drop-shadow(0 0 6px #FFFFFF) drop-shadow(0 0 14px #00F0FF) drop-shadow(0 0 24px rgba(0, 240, 255, 0.85));
+  animation: sensorCorePulse 2s ease-in-out infinite;
+}
+
+.sensor-halo {
+  filter: drop-shadow(0 0 8px currentColor);
+}
+
+.sensor-radar-ring {
+  filter: drop-shadow(0 0 10px currentColor);
+  animation: radarWave 2.8s ease-out infinite;
+}
+
+@keyframes sensorCorePulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 4px #FFFFFF) drop-shadow(0 0 12px #00F0FF) drop-shadow(0 0 20px rgba(0, 240, 255, 0.8));
+  }
+  50% {
+    filter: drop-shadow(0 0 8px #FFFFFF) drop-shadow(0 0 18px #00F0FF) drop-shadow(0 0 30px rgba(0, 240, 255, 1));
+  }
+}
+
+@keyframes radarWave {
+  0% {
+    opacity: 0.85;
+  }
+  50% {
+    opacity: 0.35;
+  }
+  100% {
+    opacity: 0.85;
+  }
+}
+
+/* Regional NER Standby Sensors across NE India */
+.ner-sensor-dot {
+  filter: drop-shadow(0 0 6px #FFFFFF) drop-shadow(0 0 14px #00F0FF) drop-shadow(0 0 20px rgba(0, 240, 255, 0.7));
+  animation: nerDotPulse 2.5s ease-in-out infinite;
+}
+
+.ner-sensor-ring {
+  filter: drop-shadow(0 0 10px rgba(0, 240, 255, 0.8));
+  animation: nerRingBreathe 3s ease-in-out infinite;
+}
+
+@keyframes nerDotPulse {
+  0%, 100% { opacity: 0.9; }
+  50% { opacity: 1; filter: drop-shadow(0 0 8px #FFFFFF) drop-shadow(0 0 18px #00F0FF); }
+}
+
+@keyframes nerRingBreathe {
+  0%, 100% { opacity: 0.65; }
+  50% { opacity: 0.95; }
+}
+
+/* Risk Heatmap Points Glow */
+.heat-marker-active {
+  filter: drop-shadow(0 0 8px rgba(0, 240, 255, 0.85)) drop-shadow(0 0 16px rgba(0, 240, 255, 0.45));
+}
+
+.heat-marker-critical {
+  filter: drop-shadow(0 0 10px rgba(255, 42, 85, 0.95)) drop-shadow(0 0 22px rgba(255, 42, 85, 0.7));
+  animation: heatCriticalThrob 1.5s ease-in-out infinite;
+}
+
+@keyframes heatCriticalThrob {
+  0%, 100% { opacity: 0.85; }
+  50% { opacity: 1; filter: drop-shadow(0 0 14px #FF2A55) drop-shadow(0 0 28px rgba(255, 42, 85, 0.9)); }
+}
+
+/* ═══════════════════════════════════════════════════════
+   HIDE LEAFLET ATTRIBUTION & BOTTOM WATERMARK
+   ═══════════════════════════════════════════════════════ */
+.leaflet-control-attribution,
+.leaflet-control-attribution a,
+.leaflet-attribution {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   NER STATE GEOGRAPHICAL HUD BADGES
+   ═══════════════════════════════════════════════════════ */
+.gis-map .leaflet-tooltip.ner-state-label {
+  background: rgba(6, 11, 24, 0.82) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  border: 1px solid rgba(0, 240, 255, 0.35) !important;
+  border-radius: 6px !important;
+  color: #F8FAFC !important;
+  font-family: var(--font-sans), system-ui, sans-serif !important;
+  font-size: 10.5px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  padding: 3px 8px !important;
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.2), 0 4px 12px rgba(0, 0, 0, 0.75) !important;
+  white-space: nowrap !important;
+  pointer-events: none !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  user-select: none !important;
+}
+
+.gis-map .leaflet-tooltip.ner-state-label::before,
+.gis-map .leaflet-tooltip.ner-state-label::after {
+  display: none !important;
+}
+
+.ner-state-label__dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #00F0FF;
+  box-shadow: 0 0 6px #00F0FF;
+  flex-shrink: 0;
+}
+
+/* Active Pilot State Highlight (Nagaland NH-29 Corridor) */
+.gis-map .leaflet-tooltip.ner-state-label--pilot {
+  background: rgba(0, 240, 255, 0.18) !important;
+  border: 1.5px solid #00F0FF !important;
+  color: #00F0FF !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.5), 0 4px 14px rgba(0, 0, 0, 0.85) !important;
+}
+
+.gis-map .leaflet-tooltip.ner-state-label--pilot .ner-state-label__dot {
+  background: #00F0FF;
+  box-shadow: 0 0 10px #00F0FF;
+  animation: radarPulse 1.4s ease-in-out infinite;
+}
+

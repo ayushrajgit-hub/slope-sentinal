@@ -1,0 +1,2292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Slope Sentinel V2 — 3D Early Warning Command Center | SIH 2026</title>
+  <meta name="description" content="Slope Sentinel V2: 3D Elevation Terrain, 48-Hour Time-to-Failure Forecast, Multi-Source GIS InSAR/Radar Stacking, Self-Healing Mesh Network, and NDMA CAP v1.2 Cell Broadcast." />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ==========================================================================
+       TACTICAL BIO-GEOLOGICAL EMERALD DESIGN SYSTEM
+       ========================================================================== */
+    :root {
+      --bg-space: #030705;
+      --bg-abyss: #050d09;
+      --bg-surface: #0a1812;
+      --bg-surface-elevated: #0f231b;
+      --bg-surface-hover: #153025;
+      
+      --border-dim: rgba(0, 255, 157, 0.12);
+      --border-bright: rgba(0, 255, 157, 0.35);
+      --border-active: #00ff9d;
+      
+      --emerald-primary: #00ff9d;
+      --emerald-secondary: #10b981;
+      --emerald-dark: #065f46;
+      --emerald-glow: rgba(0, 255, 157, 0.25);
+      
+      --cyan-radar: #00f0ff;
+      --amber-warn: #fbbf24;
+      --orange-alert: #f97316;
+      --crimson-crit: #ff2a55;
+      --crimson-glow: rgba(255, 42, 85, 0.4);
+
+      --text-primary: #f0fdf4;
+      --text-secondary: #a7f3d0;
+      --text-muted: #6ee7b7;
+      --text-dim: #34d399;
+      --text-dimmer: rgba(167, 243, 208, 0.4);
+
+      --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+      --radius-xl: 22px;
+      
+      --shadow-hud: 0 8px 32px 0 rgba(0, 0, 0, 0.6), 0 0 16px 0 rgba(0, 255, 157, 0.08);
+      --shadow-crit: 0 8px 32px 0 rgba(255, 42, 85, 0.2), 0 0 20px 0 rgba(255, 42, 85, 0.3);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-space);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      line-height: 1.5;
+      overflow-x: hidden;
+      min-height: 100vh;
+      background-image: 
+        radial-gradient(ellipse 60% 40% at 50% -10%, rgba(0, 255, 157, 0.08), transparent 70%),
+        radial-gradient(ellipse 40% 30% at 90% 90%, rgba(16, 185, 129, 0.04), transparent 60%),
+        linear-gradient(to bottom, #030705, #050d09);
+    }
+
+    /* Top Navigation HUD */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem 1.5rem;
+      background: rgba(5, 13, 9, 0.88);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-dim);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .topbar__left {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+    }
+
+    .logo-badge {
+      width: 38px;
+      height: 38px;
+      background: linear-gradient(135deg, rgba(0, 255, 157, 0.2), rgba(6, 95, 70, 0.6));
+      border: 1px solid var(--emerald-primary);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 12px var(--emerald-glow);
+    }
+
+    .logo-text h1 {
+      font-size: 1.15rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .logo-text .v2-pill {
+      background: var(--emerald-primary);
+      color: #030705;
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      font-weight: 800;
+      padding: 0.1rem 0.4rem;
+      border-radius: 4px;
+      letter-spacing: 0.05em;
+    }
+
+    .logo-subtitle {
+      font-size: 0.7rem;
+      color: var(--text-dimmer);
+      font-family: var(--font-mono);
+      letter-spacing: 0.05em;
+    }
+
+    .telemetry-ticker {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      border-left: 1px solid var(--border-dim);
+      padding-left: 1.25rem;
+    }
+
+    .telemetry-item {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .live-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--emerald-primary);
+      box-shadow: 0 0 8px var(--emerald-primary);
+      animation: pulse 2s infinite ease-in-out;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+
+    .topbar__right {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .btn-action {
+      background: var(--bg-surface-elevated);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-dim);
+      padding: 0.4rem 0.85rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      font-family: var(--font-mono);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+
+    .btn-action:hover {
+      background: var(--bg-surface-hover);
+      border-color: var(--emerald-primary);
+      color: var(--emerald-primary);
+      box-shadow: 0 0 10px rgba(0, 255, 157, 0.15);
+    }
+
+    .btn-action--primary {
+      background: var(--emerald-primary);
+      color: #030705;
+      border-color: var(--emerald-primary);
+      font-weight: 700;
+    }
+
+    .btn-action--primary:hover {
+      background: #34d399;
+      color: #030705;
+      box-shadow: 0 0 14px var(--emerald-glow);
+    }
+
+    /* Scenario Quick Selector Bar */
+    .scenario-strip {
+      background: #040906;
+      border-bottom: 1px solid var(--border-dim);
+      padding: 0.5rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      overflow-x: auto;
+    }
+
+    .scenario-label {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--text-dimmer);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      white-space: nowrap;
+    }
+
+    .scenario-btn {
+      background: rgba(10, 24, 18, 0.6);
+      border: 1px solid var(--border-dim);
+      color: var(--text-secondary);
+      padding: 0.3rem 0.75rem;
+      font-size: 0.75rem;
+      border-radius: 20px;
+      cursor: pointer;
+      font-family: var(--font-sans);
+      white-space: nowrap;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .scenario-btn:hover {
+      background: var(--bg-surface-hover);
+      border-color: var(--emerald-secondary);
+      color: #fff;
+    }
+
+    .scenario-btn.active {
+      background: rgba(0, 255, 157, 0.15);
+      border-color: var(--emerald-primary);
+      color: var(--emerald-primary);
+      font-weight: 600;
+      box-shadow: 0 0 10px rgba(0, 255, 157, 0.15);
+    }
+
+    .scenario-btn--crit.active {
+      background: rgba(255, 42, 85, 0.18);
+      border-color: var(--crimson-crit);
+      color: var(--crimson-crit);
+      box-shadow: 0 0 12px var(--crimson-glow);
+    }
+
+    /* Main Dashboard Grid Layout */
+    .dashboard-layout {
+      display: grid;
+      grid-template-columns: 340px 1fr 340px;
+      gap: 1rem;
+      padding: 1rem 1.5rem 1.5rem;
+      height: calc(100vh - 105px);
+      min-height: 720px;
+    }
+
+    @media (max-width: 1400px) {
+      .dashboard-layout {
+        grid-template-columns: 320px 1fr 320px;
+      }
+    }
+
+    @media (max-width: 1150px) {
+      .dashboard-layout {
+        grid-template-columns: 1fr;
+        height: auto;
+      }
+    }
+
+    /* Panel Base Component */
+    .hud-panel {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-dim);
+      border-radius: var(--radius-lg);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: var(--shadow-hud);
+      position: relative;
+      backdrop-filter: blur(12px);
+    }
+
+    .hud-panel::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(0, 255, 157, 0.3), transparent);
+    }
+
+    .panel-header {
+      padding: 0.85rem 1rem;
+      background: rgba(15, 35, 27, 0.5);
+      border-bottom: 1px solid var(--border-dim);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .panel-title {
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      font-family: var(--font-mono);
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .panel-badge {
+      font-size: 0.65rem;
+      font-family: var(--font-mono);
+      padding: 0.15rem 0.45rem;
+      border-radius: 4px;
+      background: rgba(0, 255, 157, 0.1);
+      color: var(--emerald-primary);
+      border: 1px solid rgba(0, 255, 157, 0.2);
+    }
+
+    .panel-body {
+      padding: 1rem;
+      overflow-y: auto;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    /* Custom Scrollbars */
+    .panel-body::-webkit-scrollbar {
+      width: 4px;
+    }
+    .panel-body::-webkit-scrollbar-thumb {
+      background: rgba(0, 255, 157, 0.2);
+      border-radius: 4px;
+    }
+
+    /* Sliders & Controls */
+    .slider-box {
+      background: rgba(5, 13, 9, 0.7);
+      border: 1px solid var(--border-dim);
+      border-radius: var(--radius-md);
+      padding: 0.85rem;
+    }
+
+    .slider-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 0.5rem;
+    }
+
+    .slider-title {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .slider-val {
+      font-family: var(--font-mono);
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--emerald-primary);
+    }
+
+    .slider-val small {
+      font-size: 0.65rem;
+      color: var(--text-dimmer);
+      font-weight: 400;
+    }
+
+    .custom-range {
+      width: 100%;
+      height: 6px;
+      appearance: none;
+      background: #11281e;
+      border-radius: 4px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .custom-range::-webkit-slider-thumb {
+      appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--emerald-primary);
+      box-shadow: 0 0 10px var(--emerald-primary);
+      cursor: pointer;
+      transition: transform 0.1s;
+    }
+
+    .custom-range::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+    }
+
+    .range-ticks {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 0.35rem;
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--text-dimmer);
+    }
+
+    /* Dynamic Risk Dial / Gauge Mini */
+    .risk-banner {
+      background: linear-gradient(135deg, rgba(10, 24, 18, 0.9), rgba(5, 13, 9, 0.95));
+      border: 1px solid var(--border-dim);
+      border-radius: var(--radius-md);
+      padding: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .risk-banner.critical {
+      border-color: var(--crimson-crit);
+      box-shadow: var(--shadow-crit);
+      background: linear-gradient(135deg, rgba(40, 10, 15, 0.9), rgba(15, 4, 6, 0.95));
+    }
+
+    .risk-score-circle {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      border: 3px solid var(--emerald-primary);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      flex-shrink: 0;
+      box-shadow: 0 0 14px var(--emerald-glow);
+      transition: all 0.3s;
+    }
+
+    .risk-score-circle .num {
+      font-size: 1.25rem;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .risk-score-circle .pct {
+      font-size: 0.6rem;
+      color: var(--text-dimmer);
+    }
+
+    .risk-banner.critical .risk-score-circle {
+      border-color: var(--crimson-crit);
+      color: var(--crimson-crit);
+      box-shadow: 0 0 18px var(--crimson-glow);
+    }
+
+    .risk-details h4 {
+      font-size: 0.75rem;
+      color: var(--text-dimmer);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-family: var(--font-mono);
+    }
+
+    .risk-level-tag {
+      font-size: 1.1rem;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      margin: 0.1rem 0;
+      color: var(--emerald-primary);
+    }
+
+    .risk-banner.critical .risk-level-tag {
+      color: var(--crimson-crit);
+    }
+
+    .risk-details p {
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+      line-height: 1.3;
+    }
+
+    /* 48-Hour Forecast Chart Container */
+    .forecast-section {
+      background: rgba(5, 13, 9, 0.7);
+      border: 1px solid var(--border-dim);
+      border-radius: var(--radius-md);
+      padding: 0.85rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .forecast-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .forecast-title {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .ttf-badge {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      background: rgba(0, 255, 157, 0.15);
+      color: var(--emerald-primary);
+      border: 1px solid rgba(0, 255, 157, 0.3);
+    }
+
+    .ttf-badge.critical {
+      background: rgba(255, 42, 85, 0.2);
+      color: var(--crimson-crit);
+      border-color: var(--crimson-crit);
+      animation: pulse 1s infinite alternate;
+    }
+
+    .forecast-canvas-wrapper {
+      position: relative;
+      width: 100%;
+      height: 120px;
+    }
+
+    #forecastCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .forecast-legend {
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--text-dimmer);
+      padding-top: 0.25rem;
+      border-top: 1px dashed rgba(0, 255, 157, 0.1);
+    }
+
+    /* Center Section: 3D Map Viewport */
+    .map-center-panel {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      border: 1px solid var(--border-bright);
+      background: #000;
+      box-shadow: 0 0 30px rgba(0, 255, 157, 0.1);
+    }
+
+    #terrainCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      cursor: grab;
+    }
+
+    #terrainCanvas:active {
+      cursor: grabbing;
+    }
+
+    /* Map HUD Overlays */
+    .map-hud-top {
+      position: absolute;
+      top: 1rem;
+      left: 1rem;
+      right: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    .map-hud-top > * {
+      pointer-events: auto;
+    }
+
+    .map-location-badge {
+      background: rgba(5, 13, 9, 0.85);
+      border: 1px solid var(--border-bright);
+      backdrop-filter: blur(12px);
+      padding: 0.6rem 0.9rem;
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-hud);
+    }
+
+    .map-location-badge h3 {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .map-location-badge p {
+      font-size: 0.68rem;
+      color: var(--text-secondary);
+      font-family: var(--font-mono);
+    }
+
+    /* Floating Layer Manager */
+    .gis-layer-hud {
+      background: rgba(5, 13, 9, 0.88);
+      border: 1px solid var(--border-bright);
+      backdrop-filter: blur(14px);
+      border-radius: var(--radius-md);
+      padding: 0.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      min-width: 210px;
+      box-shadow: var(--shadow-hud);
+    }
+
+    .gis-layer-title {
+      font-size: 0.72rem;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--emerald-primary);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-dim);
+      padding-bottom: 0.4rem;
+    }
+
+    .layer-toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: var(--text-primary);
+      cursor: pointer;
+      padding: 0.2rem 0;
+      user-select: none;
+    }
+
+    .layer-toggle-row:hover {
+      color: var(--emerald-primary);
+    }
+
+    .layer-label-group {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+    }
+
+    .layer-color-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    /* Toggle Switch */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 32px;
+      height: 18px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider-toggle {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #1a382c;
+      transition: 0.2s;
+      border-radius: 20px;
+    }
+
+    .slider-toggle:before {
+      position: absolute;
+      content: "";
+      height: 12px;
+      width: 12px;
+      left: 3px;
+      bottom: 3px;
+      background-color: #fff;
+      transition: 0.2s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider-toggle {
+      background-color: var(--emerald-primary);
+    }
+
+    input:checked + .slider-toggle:before {
+      transform: translateX(14px);
+      background-color: #030705;
+    }
+
+    /* Map Camera Control HUD at bottom */
+    .map-controls-bottom {
+      position: absolute;
+      bottom: 1rem;
+      left: 1rem;
+      right: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    .map-controls-bottom > * {
+      pointer-events: auto;
+    }
+
+    .camera-control-bar {
+      background: rgba(5, 13, 9, 0.85);
+      border: 1px solid var(--border-dim);
+      backdrop-filter: blur(12px);
+      border-radius: var(--radius-md);
+      padding: 0.4rem 0.6rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .cam-btn {
+      background: rgba(15, 35, 27, 0.8);
+      border: 1px solid var(--border-dim);
+      color: var(--text-secondary);
+      font-size: 0.7rem;
+      font-family: var(--font-mono);
+      padding: 0.35rem 0.6rem;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .cam-btn:hover, .cam-btn.active {
+      background: var(--emerald-primary);
+      color: #030705;
+      font-weight: 700;
+      border-color: var(--emerald-primary);
+    }
+
+    .elevation-legend {
+      background: rgba(5, 13, 9, 0.85);
+      border: 1px solid var(--border-dim);
+      backdrop-filter: blur(12px);
+      border-radius: var(--radius-md);
+      padding: 0.5rem 0.8rem;
+      font-size: 0.68rem;
+      font-family: var(--font-mono);
+      color: var(--text-dimmer);
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .elevation-ramp {
+      width: 140px;
+      height: 8px;
+      border-radius: 4px;
+      background: linear-gradient(to right, #0a2f1d, #10b981, #eab308, #ef4444);
+    }
+
+    .elevation-labels {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    /* Right Column: Self-Healing Mesh & Cell Broadcast Phone */
+    .right-col {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      overflow-y: auto;
+    }
+
+    /* Self Healing Mesh Network Widget */
+    .mesh-widget {
+      background: rgba(5, 13, 9, 0.85);
+      border: 1px solid var(--border-dim);
+      border-radius: var(--radius-md);
+      padding: 0.85rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .mesh-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .mesh-header h4 {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .mesh-status-tag {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      padding: 0.15rem 0.45rem;
+      border-radius: 4px;
+      background: rgba(0, 255, 157, 0.15);
+      color: var(--emerald-primary);
+    }
+
+    .mesh-status-tag.healed {
+      background: rgba(251, 191, 36, 0.2);
+      color: var(--amber-warn);
+    }
+
+    .mesh-svg-wrapper {
+      width: 100%;
+      height: 150px;
+      background: #020604;
+      border-radius: var(--radius-sm);
+      border: 1px solid rgba(0, 255, 157, 0.1);
+      position: relative;
+    }
+
+    .mesh-svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .mesh-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-mesh-fail {
+      background: rgba(255, 42, 85, 0.15);
+      color: var(--crimson-crit);
+      border: 1px solid rgba(255, 42, 85, 0.3);
+      font-size: 0.7rem;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      padding: 0.35rem 0.65rem;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all 0.2s;
+      flex: 1;
+      text-align: center;
+    }
+
+    .btn-mesh-fail:hover {
+      background: var(--crimson-crit);
+      color: #fff;
+    }
+
+    .mesh-stat-text {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--text-dimmer);
+    }
+
+    /* Smartphone Mockup Container */
+    .phone-container {
+      background: rgba(5, 13, 9, 0.85);
+      border: 1px solid var(--border-dim);
+      border-radius: var(--radius-md);
+      padding: 0.85rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .phone-tabs {
+      display: flex;
+      gap: 0.4rem;
+      border-bottom: 1px solid var(--border-dim);
+      padding-bottom: 0.4rem;
+    }
+
+    .phone-tab-btn {
+      background: none;
+      border: none;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--text-dimmer);
+      cursor: pointer;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+    }
+
+    .phone-tab-btn.active {
+      background: var(--bg-surface-elevated);
+      color: var(--emerald-primary);
+      font-weight: 600;
+    }
+
+    /* Realistic Smartphone Frame */
+    .smartphone-frame {
+      width: 100%;
+      height: 250px;
+      background: #070908;
+      border: 3px solid #202b25;
+      border-radius: 24px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.8), inset 0 0 10px rgba(0, 255, 157, 0.05);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .phone-speaker-notch {
+      width: 45px;
+      height: 4px;
+      background: #33443a;
+      border-radius: 3px;
+      margin: 6px auto 4px;
+    }
+
+    .phone-status-bar {
+      display: flex;
+      justify-content: space-between;
+      padding: 0 12px;
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      color: #94a3b8;
+    }
+
+    .phone-screen {
+      flex: 1;
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background: 
+        radial-gradient(circle at 50% 20%, rgba(16, 185, 129, 0.08), transparent 70%),
+        #050806;
+      position: relative;
+    }
+
+    /* Emergency Cell Broadcast Notification Modal */
+    .alert-card {
+      background: rgba(30, 8, 12, 0.95);
+      border: 1px solid var(--crimson-crit);
+      border-radius: 12px;
+      padding: 10px;
+      box-shadow: 0 0 16px var(--crimson-glow);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      animation: alertSlide 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes alertSlide {
+      from { transform: translateY(-20px) scale(0.95); opacity: 0; }
+      to { transform: translateY(0) scale(1); opacity: 1; }
+    }
+
+    .alert-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .alert-badge-ndma {
+      background: var(--crimson-crit);
+      color: #fff;
+      font-size: 0.55rem;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      padding: 1px 5px;
+      border-radius: 3px;
+      letter-spacing: 0.04em;
+    }
+
+    .alert-channel {
+      font-size: 0.6rem;
+      font-family: var(--font-mono);
+      color: #fca5a5;
+    }
+
+    .alert-title {
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.2;
+    }
+
+    .alert-body {
+      font-size: 0.65rem;
+      color: #fecaca;
+      line-height: 1.3;
+    }
+
+    .alert-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 4px;
+      padding-top: 4px;
+      border-top: 1px dashed rgba(255, 42, 85, 0.3);
+    }
+
+    .alert-time {
+      font-family: var(--font-mono);
+      font-size: 0.55rem;
+      color: #f87171;
+    }
+
+    .btn-sound-toggle {
+      background: none;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+      font-size: 0.6rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .raw-payload-box {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--emerald-primary);
+      background: #020604;
+      padding: 8px;
+      border-radius: var(--radius-sm);
+      height: 250px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      border: 1px solid var(--border-dim);
+    }
+
+    /* Live Terminal System Log */
+    .system-log-terminal {
+      background: #020604;
+      border: 1px solid var(--border-dim);
+      border-radius: var(--radius-md);
+      padding: 0.7rem;
+      height: 110px;
+      overflow-y: auto;
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      display: flex;
+      flex-direction: column-reverse;
+      gap: 0.25rem;
+    }
+
+    .log-line {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .log-time {
+      color: var(--text-dimmer);
+      flex-shrink: 0;
+    }
+
+    .log-msg.info { color: var(--text-secondary); }
+    .log-msg.warning { color: var(--amber-warn); }
+    .log-msg.critical { color: var(--crimson-crit); font-weight: 700; }
+    .log-msg.success { color: var(--emerald-primary); }
+
+    /* Cross-section Elevation Drawer Modal */
+    .elevation-drawer {
+      position: absolute;
+      left: 1rem;
+      bottom: 4.5rem;
+      width: 320px;
+      background: rgba(5, 13, 9, 0.92);
+      border: 1px solid var(--border-bright);
+      backdrop-filter: blur(14px);
+      border-radius: var(--radius-md);
+      padding: 0.85rem;
+      box-shadow: var(--shadow-hud);
+      display: none;
+      z-index: 20;
+    }
+
+    .elevation-drawer.open {
+      display: block;
+      animation: fadeIn 0.2s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Topbar HUD Header -->
+  <header class="topbar">
+    <div class="topbar__left">
+      <a href="index.html" class="logo-container" title="Back to V1 Landing">
+        <div class="logo-badge">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00ff9d" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="12 2 2 22 22 22 12 2"></polygon>
+            <path d="M12 11l4 7H8z"></path>
+          </svg>
+        </div>
+        <div class="logo-text">
+          <h1>SLOPE SENTINEL <span class="v2-pill">V2 COMMAND</span></h1>
+          <div class="logo-subtitle">AI-POWERED GEOTECHNICAL EARLY WARNING • SIH 2026</div>
+        </div>
+      </a>
+
+      <div class="telemetry-ticker">
+        <div class="telemetry-item">
+          <span class="live-dot"></span>
+          <span>CORRIDOR: NH-29 NAGALAND</span>
+        </div>
+        <div class="telemetry-item">
+          <span>DEM PITCH: <strong>60° 3D</strong></span>
+        </div>
+        <div class="telemetry-item">
+          <span>SENSORS: <strong>14 ACTIVE / 0 DOWN</strong></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="topbar__right">
+      <a href="index.html" class="btn-action">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        V1 Prototype
+      </a>
+      <button class="btn-action btn-action--primary" onclick="triggerTestBroadcast()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+        Trigger CAP Broadcast
+      </button>
+    </div>
+  </header>
+
+  <!-- Judge Quick Scenario Selector Strip -->
+  <div class="scenario-strip">
+    <span class="scenario-label">⚡ Judge Scenarios:</span>
+    <button class="scenario-btn active" onclick="loadScenario('dry')">
+      <span>☀️</span> 1. Nominal Pre-Monsoon (15mm/h)
+    </button>
+    <button class="scenario-btn" onclick="loadScenario('moderate')">
+      <span>🌧️</span> 2. Infiltration Warning (75mm/h)
+    </button>
+    <button class="scenario-btn scenario-btn--crit" onclick="loadScenario('cloudburst')">
+      <span>⚠️</span> 3. Extreme Cloudburst Failure (180mm/h)
+    </button>
+    <button class="scenario-btn" onclick="loadScenario('severance')">
+      <span>⚡</span> 4. Rockfall Mesh Severance & Reroute
+    </button>
+  </div>
+
+  <!-- Main 3-Column Dashboard Layout -->
+  <div class="dashboard-layout">
+    
+    <!-- LEFT COLUMN: Weather Sliders, Risk Gauge, 48-Hour Forecast Chart -->
+    <aside class="hud-panel">
+      <div class="panel-header">
+        <div class="panel-title">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--emerald-primary)" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          Multi-Source Inputs
+        </div>
+        <span class="panel-badge">REAL-TIME ML</span>
+      </div>
+
+      <div class="panel-body">
+        <!-- Slider 1: Rainfall Intensity -->
+        <div class="slider-box">
+          <div class="slider-head">
+            <span class="slider-title">IMD Rainfall Intensity</span>
+            <span class="slider-val" id="valRain">15 <small>mm/hr</small></span>
+          </div>
+          <input type="range" id="sliderRain" class="custom-range" min="0" max="200" value="15" oninput="onInputRain(this.value)">
+          <div class="range-ticks">
+            <span>0</span>
+            <span>50</span>
+            <span>100</span>
+            <span>150</span>
+            <span>200</span>
+          </div>
+        </div>
+
+        <!-- Slider 2: Soil Saturation -->
+        <div class="slider-box">
+          <div class="slider-head">
+            <span class="slider-title">Subsurface Pore Saturation</span>
+            <span class="slider-val" id="valSoil">22 <small>% VWC</small></span>
+          </div>
+          <input type="range" id="sliderSoil" class="custom-range" min="0" max="100" value="22" oninput="onInputSoil(this.value)">
+          <div class="range-ticks">
+            <span>0%</span>
+            <span>25%</span>
+            <span>50%</span>
+            <span>75%</span>
+            <span>100%</span>
+          </div>
+        </div>
+
+        <!-- Dynamic Risk Banner -->
+        <div class="risk-banner" id="riskBanner">
+          <div class="risk-score-circle" id="riskCircle">
+            <span class="num" id="riskScore">18</span>
+            <span class="pct">% RISK</span>
+          </div>
+          <div class="risk-details">
+            <h4>Factor of Safety: <span id="fosVal">1.88</span></h4>
+            <div class="risk-level-tag" id="riskLevel">NOMINAL STABLE</div>
+            <p id="riskDesc">Slope equilibrium maintained. Normal LoRa polling rate (60s).</p>
+          </div>
+        </div>
+
+        <!-- FEATURE 2: 48-Hour Predictive Time-to-Failure Forecast -->
+        <div class="forecast-section">
+          <div class="forecast-head">
+            <span class="forecast-title">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--emerald-primary)" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+              48-Hour Risk Projection
+            </span>
+            <span class="ttf-badge" id="ttfBadge">TTF: &gt; 48h (STABLE)</span>
+          </div>
+
+          <div class="forecast-canvas-wrapper">
+            <canvas id="forecastCanvas"></canvas>
+          </div>
+
+          <div class="forecast-legend">
+            <span><strong style="color:var(--crimson-crit)">—</strong> Critical Threshold (80%)</span>
+            <span><strong style="color:var(--emerald-primary)">—</strong> AI Risk Trajectory</span>
+            <span>T-0h ➔ T+48h</span>
+          </div>
+        </div>
+
+        <!-- Mini Telemetry Log -->
+        <div class="system-log-terminal" id="systemLog">
+          <div class="log-line"><span class="log-time">[12:40:02]</span><span class="log-msg success">System initialized. NH-29 Sector 14-62 DEM loaded.</span></div>
+          <div class="log-line"><span class="log-time">[12:40:05]</span><span class="log-msg info">InSAR Sentinel-1 Ascending Pass interferogram synced.</span></div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- CENTER COLUMN: FEATURE 1: 3D Terrain Map with 60° DEM pitch & FEATURE 3: GIS Layer Toggles -->
+    <main class="map-center-panel" id="mapCenterPanel">
+      
+      <!-- Top HUD on Map -->
+      <div class="map-hud-top">
+        <div class="map-location-badge">
+          <h3>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--emerald-primary)" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+            NH-29 Kohima–Dimapur Corridor
+          </h3>
+          <p>CHUMUKEDIMA ESCARPMENT • KM 14+200 TO KM 45+800</p>
+        </div>
+
+        <!-- FEATURE 3: Floating GIS Layer HUD -->
+        <div class="gis-layer-hud">
+          <div class="gis-layer-title">
+            <span>Multi-Source GIS Layers</span>
+            <span style="font-size:0.6rem; color:var(--text-dimmer)">STACK [5]</span>
+          </div>
+
+          <!-- InSAR -->
+          <label class="layer-toggle-row">
+            <div class="layer-label-group">
+              <span class="layer-color-dot" style="background:#00f0ff; box-shadow:0 0 6px #00f0ff"></span>
+              <span>Satellite InSAR (Deformation)</span>
+            </div>
+            <div class="switch">
+              <input type="checkbox" id="layerInSAR" checked onchange="toggleGISLayer('insar', this.checked)">
+              <span class="slider-toggle"></span>
+            </div>
+          </label>
+
+          <!-- IMD Doppler -->
+          <label class="layer-toggle-row">
+            <div class="layer-label-group">
+              <span class="layer-color-dot" style="background:#fbbf24; box-shadow:0 0 6px #fbbf24"></span>
+              <span>IMD Doppler Weather Radar</span>
+            </div>
+            <div class="switch">
+              <input type="checkbox" id="layerRadar" checked onchange="toggleGISLayer('radar', this.checked)">
+              <span class="slider-toggle"></span>
+            </div>
+          </label>
+
+          <!-- Soil Moisture Saturation Heatmap -->
+          <label class="layer-toggle-row">
+            <div class="layer-label-group">
+              <span class="layer-color-dot" style="background:#10b981; box-shadow:0 0 6px #10b981"></span>
+              <span>Soil Moisture Saturation</span>
+            </div>
+            <div class="switch">
+              <input type="checkbox" id="layerSoil" checked onchange="toggleGISLayer('soil', this.checked)">
+              <span class="slider-toggle"></span>
+            </div>
+          </label>
+
+          <!-- IoT Geotechnical Mesh Nodes -->
+          <label class="layer-toggle-row">
+            <div class="layer-label-group">
+              <span class="layer-color-dot" style="background:#00ff9d; box-shadow:0 0 6px #00ff9d"></span>
+              <span>LoRa IoT Telemetry Pins</span>
+            </div>
+            <div class="switch">
+              <input type="checkbox" id="layerNodes" checked onchange="toggleGISLayer('nodes', this.checked)">
+              <span class="slider-toggle"></span>
+            </div>
+          </label>
+
+          <!-- Geological Fault Line -->
+          <label class="layer-toggle-row">
+            <div class="layer-label-group">
+              <span class="layer-color-dot" style="background:#ff2a55; box-shadow:0 0 6px #ff2a55"></span>
+              <span>Disang-Barail Thrust Fault</span>
+            </div>
+            <div class="switch">
+              <input type="checkbox" id="layerFault" checked onchange="toggleGISLayer('fault', this.checked)">
+              <span class="slider-toggle"></span>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <!-- WebGL 3D Elevation Terrain Canvas -->
+      <canvas id="terrainCanvas"></canvas>
+
+      <!-- Bottom HUD on Map -->
+      <div class="map-controls-bottom">
+        <div class="camera-control-bar">
+          <button class="cam-btn active" id="btnPitch60" onclick="setPitchPreset(60)">3D Pitch 60°</button>
+          <button class="cam-btn" id="btnPitch30" onclick="setPitchPreset(35)">Low Oblique 35°</button>
+          <button class="cam-btn" id="btnPitchTop" onclick="setPitchPreset(0)">2D Nadir (Top)</button>
+          <button class="cam-btn" id="btnAutoSpin" onclick="toggleAutoSpin()">Orbit 360°</button>
+          <button class="cam-btn" onclick="toggleElevationDrawer()">Profile Cross-Section</button>
+        </div>
+
+        <div class="elevation-legend">
+          <div style="display:flex; justify-content:space-between">
+            <span>Elevation DEM</span>
+            <span style="color:var(--emerald-primary)">1,480m AMSL</span>
+          </div>
+          <div class="elevation-ramp"></div>
+          <div class="elevation-labels">
+            <span>420m (Valley)</span>
+            <span>Slope Hazard</span>
+            <span>1,480m (Ridge)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slope Cross-Section Drawer -->
+      <div class="elevation-drawer" id="elevationDrawer">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem">
+          <h4 style="font-size:0.75rem; font-family:var(--font-mono); color:var(--emerald-primary)">Slope Cross-Section Km 29</h4>
+          <button style="background:none; border:none; color:#999; cursor:pointer" onclick="toggleElevationDrawer()">✕</button>
+        </div>
+        <svg width="100%" height="85" viewBox="0 0 300 85">
+          <!-- Mountain Slope Profile -->
+          <path d="M 10 75 Q 80 65 140 35 T 290 10 L 290 80 L 10 80 Z" fill="rgba(16, 185, 129, 0.15)" stroke="#10b981" stroke-width="1.5"></path>
+          <!-- Shear Failure Slip Plane -->
+          <path d="M 90 70 Q 150 55 220 28" fill="none" stroke="#ff2a55" stroke-dasharray="4,3" stroke-width="2"></path>
+          <!-- Highway Cutting -->
+          <rect x="70" y="67" width="18" height="5" fill="#00f0ff"></rect>
+          <text x="50" y="62" font-size="8" fill="#00f0ff" font-family="JetBrains Mono">NH-29</text>
+          <!-- Soil saturation layer -->
+          <path d="M 10 75 Q 80 65 140 35 T 220 28 L 220 40 Q 150 65 90 75 Z" fill="rgba(0, 240, 255, 0.25)"></path>
+          <text x="130" y="48" font-size="8" fill="#a7f3d0" font-family="JetBrains Mono">Shear Slip Plane (42°)</text>
+        </svg>
+        <div style="font-size:0.65rem; color:var(--text-dimmer); font-family:var(--font-mono)">
+          Failure Mode: Translational planar slip along weak Barail shale boundary.
+        </div>
+      </div>
+    </main>
+
+    <!-- RIGHT COLUMN: FEATURE 4: Self-Healing Mesh & FEATURE 5: CAP Cell Broadcast Phone Preview -->
+    <aside class="right-col">
+      
+      <!-- FEATURE 4: The "Self-Healing Network" Mini-Map -->
+      <div class="hud-panel mesh-widget">
+        <div class="mesh-header">
+          <h4>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--emerald-primary)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+            Fail-Safe LoRa Mesh
+          </h4>
+          <span class="mesh-status-tag" id="meshStatus">REROUTE READY</span>
+        </div>
+
+        <div class="mesh-svg-wrapper">
+          <svg class="mesh-svg" id="meshSvg" viewBox="0 0 300 150">
+            <!-- Interconnection links -->
+            <line id="link-g-a" x1="40" y1="75" x2="110" y2="40" stroke="#00ff9d" stroke-width="2" stroke-dasharray="4,2"/>
+            <line id="link-g-b" x1="40" y1="75" x2="110" y2="110" stroke="#00ff9d" stroke-width="2" stroke-dasharray="4,2"/>
+            <line id="link-a-c" x1="110" y1="40" x2="190" y2="40" stroke="#00ff9d" stroke-width="2" stroke-dasharray="4,2"/>
+            <line id="link-b-c" x1="110" y1="110" x2="190" y2="110" stroke="#00ff9d" stroke-width="2" stroke-dasharray="4,2"/>
+            <line id="link-c-d" x1="190" y1="40" x2="260" y2="75" stroke="#00ff9d" stroke-width="2" stroke-dasharray="4,2"/>
+            <line id="link-c-b" x1="190" y1="40" x2="190" y2="110" stroke="#00ff9d" stroke-width="2" stroke-dasharray="4,2"/>
+            <!-- Emergency Bypass Route (Hidden by default) -->
+            <line id="link-reroute" x1="110" y1="110" x2="260" y2="75" stroke="#fbbf24" stroke-width="2.5" stroke-dasharray="3,3" opacity="0"/>
+
+            <!-- Moving Packets -->
+            <circle id="pkt1" r="3" fill="#00ff9d" filter="drop-shadow(0 0 4px #00ff9d)"/>
+            <circle id="pkt2" r="3" fill="#00ff9d" filter="drop-shadow(0 0 4px #00ff9d)"/>
+
+            <!-- Gateway Node -->
+            <circle cx="40" cy="75" r="12" fill="#065f46" stroke="#00ff9d" stroke-width="2"/>
+            <text x="40" y="78" font-size="8" fill="#fff" font-family="JetBrains Mono" text-anchor="middle" font-weight="bold">GW</text>
+
+            <!-- Node Alpha -->
+            <circle id="nodeA" cx="110" cy="40" r="10" fill="#0f231b" stroke="#00ff9d" stroke-width="2"/>
+            <text x="110" y="43" font-size="7" fill="#a7f3d0" font-family="JetBrains Mono" text-anchor="middle">A-01</text>
+
+            <!-- Node Beta (Candidate for failure) -->
+            <circle id="nodeB" cx="110" cy="110" r="10" fill="#0f231b" stroke="#00ff9d" stroke-width="2"/>
+            <text x="110" y="113" font-size="7" fill="#a7f3d0" font-family="JetBrains Mono" text-anchor="middle">B-02</text>
+
+            <!-- Node Gamma (Mid-Slope Repeater) -->
+            <circle id="nodeC" cx="190" cy="40" r="10" fill="#0f231b" stroke="#00ff9d" stroke-width="2"/>
+            <text x="190" y="43" font-size="7" fill="#a7f3d0" font-family="JetBrains Mono" text-anchor="middle">C-03</text>
+
+            <!-- Node Delta (Ridge Top Solar Relay) -->
+            <circle id="nodeD" cx="260" cy="75" r="12" fill="#0f231b" stroke="#00ff9d" stroke-width="2"/>
+            <text x="260" y="78" font-size="7" fill="#00ff9d" font-family="JetBrains Mono" text-anchor="middle" font-weight="bold">D-RELAY</text>
+          </svg>
+        </div>
+
+        <div class="mesh-footer">
+          <button class="btn-mesh-fail" id="btnToggleFail" onclick="toggleMeshFailure()">
+            ⚡ Simulate Sensor Failure
+          </button>
+          <div class="mesh-stat-text">
+            Packets: <span id="meshPktRate" style="color:var(--emerald-primary)">100% (0 Lost)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- FEATURE 5: SMS / Cell Broadcast Payload Preview (CAP v1.2) -->
+      <div class="hud-panel phone-container">
+        <div class="phone-tabs">
+          <button class="phone-tab-btn active" id="tabPhoneBtn" onclick="setPhoneTab('phone')">Phone Alert Mockup</button>
+          <button class="phone-tab-btn" id="tabCapBtn" onclick="setPhoneTab('cap')">CAP v1.2 Payload</button>
+          <button class="phone-tab-btn" id="tabLangBtn" onclick="toggleAlertLang()" style="margin-left:auto">ENG / हिन्दी</button>
+        </div>
+
+        <!-- Phone Device Mockup Screen -->
+        <div class="smartphone-frame" id="phoneMockup">
+          <div class="phone-speaker-notch"></div>
+          <div class="phone-status-bar">
+            <span>NDMA CELL 4G</span>
+            <span id="phoneClock">12:42</span>
+            <span>88% 🔋</span>
+          </div>
+
+          <div class="phone-screen" id="phoneScreen">
+            <div class="alert-card" id="alertCard">
+              <div class="alert-header">
+                <span class="alert-badge-ndma">NDMA EXTREME</span>
+                <span class="alert-channel">Cell Broadcast #4370</span>
+              </div>
+              <div class="alert-title" id="alertCardTitle">EMERGENCY: EVACUATE NH-29 SECTOR A</div>
+              <div class="alert-body" id="alertCardBody">
+                GSI & Slope Sentinel alert: Catastrophic slope failure imminent between Km 18 and Km 32. Evacuate highway corridor immediately to designated relief zone.
+              </div>
+              <div class="alert-actions">
+                <span class="alert-time">CAP ID: IN-NDMA-2026-0906</span>
+                <button class="btn-sound-toggle" onclick="toggleSirenSound()">🔊 Sound Alert</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Raw CAP v1.2 JSON / XML Viewer (Initially Hidden) -->
+        <div class="raw-payload-box" id="rawCapPayload" style="display:none;"></div>
+      </div>
+    </aside>
+
+  </div>
+
+  <!-- =========================================================================
+       CORE INTERACTIVE LOGIC (3D TERRAIN, 48H FORECAST, MESH, CAP & WEBAUDIO)
+       ========================================================================= -->
+  <script>
+    // State Variables
+    let rainfall = 15;
+    let soilMoisture = 22;
+    let riskScore = 18;
+    let cameraPitch = 60; // 60 degrees 3D elevation
+    let cameraYaw = -25;
+    let cameraZoom = 1.0;
+    let isAutoSpinning = false;
+    let meshFailed = false;
+    let alertLang = 'EN';
+    let activePhoneTab = 'phone';
+    let sirenPlaying = false;
+    let audioCtx = null;
+
+    const layers = {
+      insar: true,
+      radar: true,
+      soil: true,
+      nodes: true,
+      fault: true
+    };
+
+    // Calculate Physical Factor of Safety & Risk Score
+    function computeRisk(rain, soil) {
+      // Degradation model: higher rain & pore pressure degrade slope Factor of Safety
+      const rainFactor = Math.pow(rain / 200, 1.25) * 60;
+      const soilFactor = Math.pow(soil / 100, 1.2) * 40;
+      const score = Math.min(100, Math.max(0, rainFactor + soilFactor));
+      
+      // Factor of Safety: nominal ~2.0, failure threshold 1.0 at ~80% risk
+      const fos = Math.max(0.65, Number((2.1 - (score / 100) * 1.35).toFixed(2)));
+      return { score: Math.round(score), fos };
+    }
+
+    // Input handlers
+    function onInputRain(val) {
+      rainfall = Number(val);
+      document.getElementById('valRain').innerHTML = `${rainfall} <small>mm/hr</small>`;
+      updateSystem();
+    }
+
+    function onInputSoil(val) {
+      soilMoisture = Number(val);
+      document.getElementById('valSoil').innerHTML = `${soilMoisture} <small>% VWC</small>`;
+      updateSystem();
+    }
+
+    function updateSystem() {
+      const { score, fos } = computeRisk(rainfall, soilMoisture);
+      riskScore = score;
+
+      // Update Risk Dial & Badges
+      document.getElementById('riskScore').innerText = riskScore;
+      document.getElementById('fosVal').innerText = fos;
+
+      const riskBanner = document.getElementById('riskBanner');
+      const riskLevel = document.getElementById('riskLevel');
+      const riskDesc = document.getElementById('riskDesc');
+      const ttfBadge = document.getElementById('ttfBadge');
+
+      if (riskScore < 35) {
+        riskLevel.innerText = 'NOMINAL STABLE';
+        riskLevel.style.color = 'var(--emerald-primary)';
+        riskDesc.innerText = 'Slope equilibrium nominal. Sensor mesh polling at 60s.';
+        riskBanner.className = 'risk-banner';
+        ttfBadge.className = 'ttf-badge';
+        ttfBadge.innerText = 'TTF: > 48h (STABLE)';
+      } else if (riskScore < 65) {
+        riskLevel.innerText = 'ELEVATED WATCH';
+        riskLevel.style.color = 'var(--amber-warn)';
+        riskDesc.innerText = 'Transient pore water pressure accumulating. Polling 15s.';
+        riskBanner.className = 'risk-banner';
+        ttfBadge.className = 'ttf-badge';
+        ttfBadge.innerText = 'TTF: 18h - 24h';
+      } else if (riskScore < 80) {
+        riskLevel.innerText = 'HIGH WARNING';
+        riskLevel.style.color = 'var(--orange-alert)';
+        riskDesc.innerText = 'Micro-fractures detected along shear plane. Pre-alert active.';
+        riskBanner.className = 'risk-banner';
+        ttfBadge.className = 'ttf-badge';
+        ttfBadge.innerText = 'TTF: 6h - 8h (HIGH RISK)';
+      } else {
+        riskLevel.innerText = 'CRITICAL FAILURE IMMINENT';
+        riskLevel.style.color = 'var(--crimson-crit)';
+        riskDesc.innerText = 'Factor of Safety < 1.0. Shear strain runaway! Evacuation required.';
+        riskBanner.className = 'risk-banner critical';
+        ttfBadge.className = 'ttf-badge critical';
+        ttfBadge.innerText = 'TTF: T+3h 45m (CRITICAL)';
+        
+        // Auto trigger broadcast when crossing into critical
+        triggerAlertNotification();
+      }
+
+      // Re-render Forecast Chart
+      renderForecastChart();
+      // Render terrain frame
+      renderTerrain();
+      // Update CAP raw payload
+      updateCapPayload();
+    }
+
+    // =========================================================================
+    // FEATURE 2: 48-HOUR TIME-TO-FAILURE FORECAST GRAPH (Canvas Engine)
+    // =========================================================================
+    const forecastCanvas = document.getElementById('forecastCanvas');
+    const fCtx = forecastCanvas.getContext('2d');
+
+    function resizeForecastCanvas() {
+      forecastCanvas.width = forecastCanvas.parentElement.clientWidth * window.devicePixelRatio;
+      forecastCanvas.height = forecastCanvas.parentElement.clientHeight * window.devicePixelRatio;
+      renderForecastChart();
+    }
+    window.addEventListener('resize', resizeForecastCanvas);
+
+    function renderForecastChart() {
+      if (!forecastCanvas.width) return;
+      const w = forecastCanvas.width;
+      const h = forecastCanvas.height;
+      const dpr = window.devicePixelRatio || 1;
+
+      fCtx.clearRect(0, 0, w, h);
+
+      const padL = 35 * dpr;
+      const padR = 15 * dpr;
+      const padT = 15 * dpr;
+      const padB = 22 * dpr;
+      const plotW = w - padL - padR;
+      const plotH = h - padT - padB;
+
+      // Draw Grid Lines
+      fCtx.strokeStyle = 'rgba(0, 255, 157, 0.08)';
+      fCtx.lineWidth = 1 * dpr;
+      fCtx.font = `${9 * dpr}px JetBrains Mono`;
+      fCtx.fillStyle = 'rgba(167, 243, 208, 0.4)';
+
+      // Y-axis ticks (0%, 50%, 80%, 100%)
+      const yTicks = [0, 50, 80, 100];
+      yTicks.forEach(tick => {
+        const y = padT + plotH - (tick / 100) * plotH;
+        fCtx.beginPath();
+        fCtx.moveTo(padL, y);
+        fCtx.lineTo(w - padR, y);
+        fCtx.stroke();
+        fCtx.fillText(`${tick}%`, 6 * dpr, y + 3 * dpr);
+      });
+
+      // Red Critical 80% Threshold Line
+      const y80 = padT + plotH - (80 / 100) * plotH;
+      fCtx.save();
+      fCtx.strokeStyle = 'rgba(255, 42, 85, 0.85)';
+      fCtx.setLineDash([4 * dpr, 4 * dpr]);
+      fCtx.lineWidth = 1.5 * dpr;
+      fCtx.beginPath();
+      fCtx.moveTo(padL, y80);
+      fCtx.lineTo(w - padR, y80);
+      fCtx.stroke();
+      fCtx.restore();
+
+      // Compute Curve Points for 48 Hours
+      const totalHours = 48;
+      const points = [];
+      const baseSlope = (rainfall / 200) * 1.5 + (soilMoisture / 100) * 1.1;
+
+      for (let hr = 0; hr <= totalHours; hr += 2) {
+        // Non-linear acceleration as rainfall saturates porous bedrock
+        let proj = riskScore + Math.pow(hr / 12, 1.6) * (baseSlope * 14);
+        if (riskScore < 25) {
+          proj = riskScore + Math.sin(hr / 6) * 4; // Flat oscillation in nominal weather
+        }
+        proj = Math.min(100, Math.max(0, proj));
+
+        const x = padL + (hr / totalHours) * plotW;
+        const y = padT + plotH - (proj / 100) * plotH;
+        points.push({ x, y, hr, risk: proj });
+      }
+
+      // Shaded Confidence Band (95% Bayesian Confidence)
+      fCtx.beginPath();
+      for (let i = 0; i < points.length; i++) {
+        const spread = (points[i].hr / totalHours) * 18 * dpr;
+        const cy = Math.max(padT, points[i].y - spread);
+        if (i === 0) fCtx.moveTo(points[i].x, cy);
+        else fCtx.lineTo(points[i].x, cy);
+      }
+      for (let i = points.length - 1; i >= 0; i--) {
+        const spread = (points[i].hr / totalHours) * 18 * dpr;
+        const cy = Math.min(padT + plotH, points[i].y + spread);
+        fCtx.lineTo(points[i].x, cy);
+      }
+      fCtx.closePath();
+      fCtx.fillStyle = riskScore > 75 ? 'rgba(255, 42, 85, 0.12)' : 'rgba(0, 255, 157, 0.08)';
+      fCtx.fill();
+
+      // Glowing Predictive Risk Line
+      fCtx.save();
+      fCtx.beginPath();
+      points.forEach((p, i) => {
+        if (i === 0) fCtx.moveTo(p.x, p.y);
+        else fCtx.lineTo(p.x, p.y);
+      });
+      fCtx.strokeStyle = riskScore > 75 ? '#ff2a55' : '#00ff9d';
+      fCtx.lineWidth = 2.5 * dpr;
+      fCtx.shadowColor = riskScore > 75 ? '#ff2a55' : '#00ff9d';
+      fCtx.shadowBlur = 10 * dpr;
+      fCtx.stroke();
+      fCtx.restore();
+
+      // Mark Breach Intersection if crosses 80%
+      const breachPoint = points.find(p => p.risk >= 80);
+      if (breachPoint && riskScore < 80) {
+        fCtx.fillStyle = '#ff2a55';
+        fCtx.beginPath();
+        fCtx.arc(breachPoint.x, breachPoint.y, 5 * dpr, 0, Math.PI * 2);
+        fCtx.fill();
+
+        fCtx.font = `bold ${8 * dpr}px JetBrains Mono`;
+        fCtx.fillStyle = '#fff';
+        fCtx.fillText(`T+${breachPoint.hr}h BREACH`, breachPoint.x - 25 * dpr, breachPoint.y - 8 * dpr);
+      }
+
+      // X-axis Hour Ticks
+      fCtx.fillStyle = 'rgba(167, 243, 208, 0.4)';
+      [0, 12, 24, 36, 48].forEach(hr => {
+        const x = padL + (hr / totalHours) * plotW;
+        fCtx.fillText(`T+${hr}h`, x - 10 * dpr, h - 5 * dpr);
+      });
+    }
+
+    // =========================================================================
+    // FEATURE 1: 3D TERRAIN DIGITAL ELEVATION MODEL (WebGL/Canvas Engine)
+    // =========================================================================
+    const terrainCanvas = document.getElementById('terrainCanvas');
+    const tCtx = terrainCanvas.getContext('2d');
+    let isDragging = false;
+    let dragStartX = 0;
+    let dragStartY = 0;
+
+    function resizeTerrainCanvas() {
+      terrainCanvas.width = terrainCanvas.parentElement.clientWidth * window.devicePixelRatio;
+      terrainCanvas.height = terrainCanvas.parentElement.clientHeight * window.devicePixelRatio;
+      renderTerrain();
+    }
+    window.addEventListener('resize', resizeTerrainCanvas);
+
+    // Mouse Interaction for 3D Camera Rotation (Pitch & Yaw)
+    terrainCanvas.addEventListener('mousedown', (e) => {
+      isDragging = true;
+      dragStartX = e.clientX;
+      dragStartY = e.clientY;
+      isAutoSpinning = false;
+      document.getElementById('btnAutoSpin').classList.remove('active');
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      const dx = e.clientX - dragStartX;
+      const dy = e.clientY - dragStartY;
+      dragStartX = e.clientX;
+      dragStartY = e.clientY;
+
+      cameraYaw += dx * 0.4;
+      cameraPitch = Math.max(0, Math.min(85, cameraPitch - dy * 0.3));
+      renderTerrain();
+    });
+
+    window.addEventListener('mouseup', () => { isDragging = false; });
+
+    function setPitchPreset(pitch) {
+      cameraPitch = pitch;
+      document.querySelectorAll('.cam-btn').forEach(b => b.classList.remove('active'));
+      if (pitch === 60) document.getElementById('btnPitch60').classList.add('active');
+      if (pitch === 35) document.getElementById('btnPitch30').classList.add('active');
+      if (pitch === 0) document.getElementById('btnPitchTop').classList.add('active');
+      renderTerrain();
+    }
+
+    function toggleAutoSpin() {
+      isAutoSpinning = !isAutoSpinning;
+      document.getElementById('btnAutoSpin').classList.toggle('active', isAutoSpinning);
+      if (isAutoSpinning) autoSpinLoop();
+    }
+
+    function autoSpinLoop() {
+      if (!isAutoSpinning) return;
+      cameraYaw += 0.4;
+      renderTerrain();
+      requestAnimationFrame(autoSpinLoop);
+    }
+
+    // Synthetic Mountain Topography Generator
+    function getElevation(x, z) {
+      // Realistic Kohima escarpment: steep ridge on left, valley canyon with highway in middle, rolling foothills on right
+      const r1 = Math.sin(x * 0.015) * Math.cos(z * 0.018) * 110;
+      const r2 = Math.sin(x * 0.04 - 1.2) * 55;
+      const canyon = -Math.exp(-Math.pow((x - 10) * 0.02, 2)) * 95;
+      const ridge = Math.exp(-Math.pow((x + 85) * 0.018, 2)) * 140;
+      return 150 + r1 + r2 + canyon + ridge;
+    }
+
+    function renderTerrain() {
+      if (!terrainCanvas.width) return;
+      const w = terrainCanvas.width;
+      const h = terrainCanvas.height;
+      const dpr = window.devicePixelRatio || 1;
+
+      tCtx.clearRect(0, 0, w, h);
+
+      // Deep Space / Atmospheric Fog
+      const gradSky = tCtx.createLinearGradient(0, 0, 0, h);
+      gradSky.addColorStop(0, '#020604');
+      gradSky.addColorStop(0.5, '#040f09');
+      gradSky.addColorStop(1, '#081c13');
+      tCtx.fillStyle = gradSky;
+      tCtx.fillRect(0, 0, w, h);
+
+      // 3D Perspective Projection Matrix
+      const pitchRad = (cameraPitch * Math.PI) / 180;
+      const yawRad = (cameraYaw * Math.PI) / 180;
+      const cosP = Math.cos(pitchRad);
+      const sinP = Math.sin(pitchRad);
+      const cosY = Math.cos(yawRad);
+      const sinY = Math.sin(yawRad);
+
+      const fov = 340 * dpr;
+      const cx = w / 2;
+      const cy = h / 2 + (cameraPitch === 0 ? 0 : 80 * dpr * sinP);
+
+      function project(x, y, z) {
+        // Rotate Yaw
+        const rx = x * cosY - z * sinY;
+        const rz = x * sinY + z * cosY;
+        // Rotate Pitch
+        const ry = y * cosP - rz * sinP;
+        const fz = y * sinP + rz * cosP + 480;
+
+        const scale = fov / Math.max(10, fz);
+        return {
+          sx: cx + rx * scale,
+          sy: cy - ry * scale,
+          scale,
+          depth: fz
+        };
+      }
+
+      // Generate Terrain Mesh Grid
+      const rows = 32;
+      const cols = 32;
+      const step = 14;
+      const grid = [];
+
+      for (let r = -rows / 2; r <= rows / 2; r++) {
+        const rowArr = [];
+        for (let c = -cols / 2; c <= cols / 2; c++) {
+          const x = c * step;
+          const z = r * step;
+          const elev = getElevation(x, z);
+          const p = project(x, elev, z);
+          rowArr.push({ x, y: elev, z, ...p });
+        }
+        grid.push(rowArr);
+      }
+
+      // Draw Shaded 3D Polygon Quads (Painter's Algorithm: back to front)
+      for (let r = 0; r < grid.length - 1; r++) {
+        for (let c = 0; c < grid[r].length - 1; c++) {
+          const p1 = grid[r][c];
+          const p2 = grid[r][c + 1];
+          const p3 = grid[r + 1][c + 1];
+          const p4 = grid[r + 1][c];
+
+          const avgElev = (p1.y + p2.y + p3.y + p4.y) / 4;
+          const slopeIntensity = (riskScore / 100);
+
+          tCtx.beginPath();
+          tCtx.moveTo(p1.sx, p1.sy);
+          tCtx.lineTo(p2.sx, p2.sy);
+          tCtx.lineTo(p3.sx, p3.sy);
+          tCtx.lineTo(p4.sx, p4.sy);
+          tCtx.closePath();
+
+          // Altitude color ramp + Draped Hazard Heatmap
+          let fillCol = '#0a2318';
+          if (avgElev > 240) fillCol = '#1a4833';
+          else if (avgElev > 180) fillCol = '#0f3223';
+          else if (avgElev < 110) fillCol = '#06160f'; // Valley floor
+
+          // Overlay Hazard Gradient if critical
+          if (slopeIntensity > 0.3 && avgElev > 140 && p1.x < 30) {
+            if (slopeIntensity > 0.75) fillCol = 'rgba(255, 42, 85, 0.45)';
+            else if (slopeIntensity > 0.5) fillCol = 'rgba(251, 191, 36, 0.35)';
+            else fillCol = 'rgba(0, 240, 255, 0.25)';
+          }
+
+          tCtx.fillStyle = fillCol;
+          tCtx.fill();
+
+          // 3D Topographic Contour Wireframe
+          tCtx.strokeStyle = 'rgba(0, 255, 157, 0.12)';
+          tCtx.lineWidth = 0.6 * dpr;
+          tCtx.stroke();
+        }
+      }
+
+      // FEATURE 3: Render Active GIS Layers onto 3D Surface
+      // 1. Highway Corridor Ribbon (NH-29)
+      const hwPoints = [
+        { x: -90, z: -180 }, { x: -60, z: -120 }, { x: -25, z: -60 },
+        { x: 5, z: 0 }, { x: 35, z: 60 }, { x: 75, z: 120 }, { x: 110, z: 180 }
+      ];
+
+      tCtx.save();
+      tCtx.beginPath();
+      hwPoints.forEach((pt, i) => {
+        const elev = getElevation(pt.x, pt.z) + 4;
+        const proj = project(pt.x, elev, pt.z);
+        if (i === 0) tCtx.moveTo(proj.sx, proj.sy);
+        else tCtx.lineTo(proj.sx, proj.sy);
+      });
+      tCtx.strokeStyle = riskScore > 75 ? '#ff2a55' : '#00f0ff';
+      tCtx.lineWidth = 3.5 * dpr;
+      tCtx.shadowColor = riskScore > 75 ? '#ff2a55' : '#00f0ff';
+      tCtx.shadowBlur = 8 * dpr;
+      tCtx.setLineDash([8 * dpr, 4 * dpr]);
+      tCtx.stroke();
+      tCtx.restore();
+
+      // 2. InSAR Deformation Layer (Fringe pulses on steep scarps)
+      if (layers.insar) {
+        tCtx.save();
+        tCtx.fillStyle = 'rgba(0, 240, 255, 0.18)';
+        for (let i = 0; i < 4; i++) {
+          const ix = -50 + i * 15;
+          const iz = -30 + i * 20;
+          const proj = project(ix, getElevation(ix, iz) + 6, iz);
+          tCtx.beginPath();
+          tCtx.arc(proj.sx, proj.sy, (18 + Math.sin(Date.now() * 0.003 + i) * 6) * dpr, 0, Math.PI * 2);
+          tCtx.fill();
+        }
+        tCtx.restore();
+      }
+
+      // 3. IMD Radar Cloudburst Precipitation Layer
+      if (layers.radar && rainfall > 30) {
+        tCtx.save();
+        tCtx.fillStyle = 'rgba(251, 191, 36, 0.15)';
+        const proj = project(0, 310, 0);
+        tCtx.beginPath();
+        tCtx.ellipse(proj.sx, proj.sy, 90 * dpr, 45 * dpr, 0.3, 0, Math.PI * 2);
+        tCtx.fill();
+        tCtx.strokeStyle = 'rgba(251, 191, 36, 0.4)';
+        tCtx.setLineDash([3 * dpr, 3 * dpr]);
+        tCtx.stroke();
+        tCtx.restore();
+      }
+
+      // 4. Geological Fault Line (Disang-Barail Thrust)
+      if (layers.fault) {
+        tCtx.save();
+        tCtx.beginPath();
+        const fPoints = [{ x: -140, z: -100 }, { x: -60, z: -20 }, { x: 20, z: 70 }, { x: 100, z: 160 }];
+        fPoints.forEach((pt, i) => {
+          const proj = project(pt.x, getElevation(pt.x, pt.z) + 3, pt.z);
+          if (i === 0) tCtx.moveTo(proj.sx, proj.sy);
+          else tCtx.lineTo(proj.sx, proj.sy);
+        });
+        tCtx.strokeStyle = '#ff2a55';
+        tCtx.lineWidth = 2 * dpr;
+        tCtx.stroke();
+        tCtx.restore();
+      }
+
+      // 5. LoRa IoT Sensor Pins
+      if (layers.nodes) {
+        const stations = [
+          { name: 'Node α (Toe Piezometer)', x: -25, z: -60 },
+          { name: 'Node β (Mid Extensometer)', x: -50, z: 20 },
+          { name: 'Node γ (Crown Inclinometer)', x: -80, z: -20 },
+          { name: 'Relay δ (Ridge Gateway)', x: 60, z: 80 }
+        ];
+
+        stations.forEach(st => {
+          const elev = getElevation(st.x, st.z) + 12;
+          const proj = project(st.x, elev, st.z);
+
+          // Glowing Pin
+          tCtx.save();
+          tCtx.fillStyle = '#00ff9d';
+          tCtx.shadowColor = '#00ff9d';
+          tCtx.shadowBlur = 10 * dpr;
+          tCtx.beginPath();
+          tCtx.arc(proj.sx, proj.sy, 4.5 * dpr, 0, Math.PI * 2);
+          tCtx.fill();
+
+          // Label
+          tCtx.font = `600 ${8 * dpr}px JetBrains Mono`;
+          tCtx.fillStyle = '#f0fdf4';
+          tCtx.fillText(st.name, proj.sx + 8 * dpr, proj.sy + 3 * dpr);
+          tCtx.restore();
+        });
+      }
+    }
+
+    // Toggle GIS Layers
+    function toggleGISLayer(layerKey, isChecked) {
+      layers[layerKey] = isChecked;
+      addLog(`GIS Layer [${layerKey.toUpperCase()}] set to: ${isChecked ? 'VISIBLE' : 'HIDDEN'}`, 'info');
+      renderTerrain();
+    }
+
+    function toggleElevationDrawer() {
+      const el = document.getElementById('elevationDrawer');
+      el.classList.toggle('open');
+    }
+
+    // =========================================================================
+    // FEATURE 4: SELF-HEALING LORA MESH NETWORK SIMULATION
+    // =========================================================================
+    function toggleMeshFailure() {
+      meshFailed = !meshFailed;
+      const btn = document.getElementById('btnToggleFail');
+      const nodeB = document.getElementById('nodeB');
+      const linkGB = document.getElementById('link-g-b');
+      const linkBC = document.getElementById('link-b-c');
+      const linkReroute = document.getElementById('link-reroute');
+      const meshStatus = document.getElementById('meshStatus');
+      const meshPktRate = document.getElementById('meshPktRate');
+
+      if (meshFailed) {
+        btn.innerText = '↺ Restore Severed Sensor B-02';
+        btn.style.background = 'rgba(0, 255, 157, 0.2)';
+        btn.style.borderColor = 'var(--emerald-primary)';
+        btn.style.color = 'var(--emerald-primary)';
+
+        // Cut Node B
+        nodeB.setAttribute('stroke', '#ff2a55');
+        nodeB.setAttribute('fill', '#330810');
+        linkGB.setAttribute('stroke', '#ff2a55');
+        linkGB.setAttribute('stroke-dasharray', '2,2');
+        linkBC.setAttribute('stroke', '#ff2a55');
+        linkBC.setAttribute('stroke-dasharray', '2,2');
+
+        // Instant Dynamic Reroute via Relay D
+        linkReroute.style.opacity = '1';
+        meshStatus.innerText = 'REROUTED (FAIL-SAFE HEALED)';
+        meshStatus.className = 'mesh-status-tag healed';
+        meshPktRate.innerText = '100% (Rerouted via D-Relay, +18ms)';
+        meshPktRate.style.color = 'var(--amber-warn)';
+
+        addLog(`CRITICAL: Node B-02 offline (Rockfall severance detected).`, 'critical');
+        addLog(`Mesh self-healing triggered: Dynamic reroute via Ridge Relay D completed in 142ms.`, 'success');
+      } else {
+        btn.innerText = '⚡ Simulate Sensor Failure';
+        btn.style.background = 'rgba(255, 42, 85, 0.15)';
+        btn.style.borderColor = 'rgba(255, 42, 85, 0.3)';
+        btn.style.color = 'var(--crimson-crit)';
+
+        nodeB.setAttribute('stroke', '#00ff9d');
+        nodeB.setAttribute('fill', '#0f231b');
+        linkGB.setAttribute('stroke', '#00ff9d');
+        linkGB.setAttribute('stroke-dasharray', '4,2');
+        linkBC.setAttribute('stroke', '#00ff9d');
+        linkBC.setAttribute('stroke-dasharray', '4,2');
+
+        linkReroute.style.opacity = '0';
+        meshStatus.innerText = 'OPTIMAL MESH';
+        meshStatus.className = 'mesh-status-tag';
+        meshPktRate.innerText = '100% (0 Lost)';
+        meshPktRate.style.color = 'var(--emerald-primary)';
+
+        addLog(`Node B-02 restored. Mesh restored to primary shortest-path routing.`, 'success');
+      }
+    }
+
+    // Packet Animation Loop on SVG Mesh
+    let pktT = 0;
+    function animateMeshPackets() {
+      pktT = (pktT + 0.015) % 1;
+      const pkt1 = document.getElementById('pkt1');
+      const pkt2 = document.getElementById('pkt2');
+
+      if (!meshFailed) {
+        // Flow G -> A -> C
+        pkt1.setAttribute('cx', 40 + pktT * 70);
+        pkt1.setAttribute('cy', 75 - pktT * 35);
+        pkt2.setAttribute('cx', 110 + pktT * 80);
+        pkt2.setAttribute('cy', 40);
+      } else {
+        // Flow G -> A -> D -> C (Reroute)
+        pkt1.setAttribute('cx', 40 + pktT * 70);
+        pkt1.setAttribute('cy', 75 - pktT * 35);
+        pkt2.setAttribute('cx', 110 + pktT * 150);
+        pkt2.setAttribute('cy', 40 + pktT * 35);
+      }
+      requestAnimationFrame(animateMeshPackets);
+    }
+    animateMeshPackets();
+
+    // =========================================================================
+    // FEATURE 5: CAP v1.2 CELL BROADCAST PHONE PREVIEW & WEBAUDIO
+    // =========================================================================
+    function triggerAlertNotification() {
+      const card = document.getElementById('alertCard');
+      card.style.animation = 'none';
+      void card.offsetWidth; // Trigger reflow
+      card.style.animation = 'alertSlide 0.4s cubic-bezier(0.16, 1, 0.3, 1)';
+
+      if (riskScore >= 80) {
+        addLog(`CAP v1.2 EXTREME Broadcast issued to Nagaland DEOC & Cell Towers.`, 'critical');
+      }
+    }
+
+    function triggerTestBroadcast() {
+      // Force test alert
+      document.getElementById('sliderRain').value = 175;
+      document.getElementById('sliderSoil').value = 85;
+      onInputRain(175);
+      onInputSoil(85);
+      triggerAlertNotification();
+    }
+
+    function toggleAlertLang() {
+      alertLang = alertLang === 'EN' ? 'HI' : 'EN';
+      const title = document.getElementById('alertCardTitle');
+      const body = document.getElementById('alertCardBody');
+
+      if (alertLang === 'HI') {
+        title.innerText = 'आपातकालीन चेतावनी: NH-29 खाली करें';
+        body.innerText = 'भूवैज्ञानिक सर्वेक्षण (GSI) व स्लोप सेंटिनल चेतावनी: किमी 18 से 32 के बीच भारी भूस्खलन का तत्काल खतरा। तुरंत उच्च सुरक्षित स्थान पर जाएं।';
+      } else {
+        title.innerText = 'EMERGENCY: EVACUATE NH-29 SECTOR A';
+        body.innerText = 'GSI & Slope Sentinel alert: Catastrophic slope failure imminent between Km 18 and Km 32. Evacuate highway corridor immediately to designated relief zone.';
+      }
+    }
+
+    function setPhoneTab(tab) {
+      activePhoneTab = tab;
+      document.getElementById('tabPhoneBtn').classList.toggle('active', tab === 'phone');
+      document.getElementById('tabCapBtn').classList.toggle('active', tab === 'cap');
+      document.getElementById('phoneMockup').style.display = tab === 'phone' ? 'flex' : 'none';
+      document.getElementById('rawCapPayload').style.display = tab === 'cap' ? 'block' : 'none';
+    }
+
+    function updateCapPayload() {
+      const capObj = {
+        identifier: `IN-NDMA-CAP-2026-0906-${Math.floor(Math.random() * 900 + 100)}`,
+        sender: "slope-sentinel-deoc@nagaland.gov.in",
+        sent: new Date().toISOString(),
+        status: "Actual",
+        msgType: riskScore >= 80 ? "Alert" : "Update",
+        scope: "Public",
+        info: {
+          category: "Geo",
+          event: "Imminent Landslide Failure",
+          urgency: riskScore >= 80 ? "Immediate" : "Expected",
+          severity: riskScore >= 80 ? "Extreme" : "Moderate",
+          certainty: "Observed (Physics ML + InSAR)",
+          area: {
+            areaDesc: "Nagaland NH-29 Corridor Km 14+200 - 45+800",
+            polygon: "25.670,93.720 25.710,93.792 25.750,93.830 25.790,93.870"
+          },
+          parameters: {
+            rainfall_intensity_mmhr: rainfall,
+            soil_pore_saturation_pct: soilMoisture,
+            factor_of_safety: computeRisk(rainfall, soilMoisture).fos,
+            time_to_failure: riskScore >= 80 ? "T+3h 45m" : ">48h"
+          }
+        }
+      };
+
+      document.getElementById('rawCapPayload').innerText = JSON.stringify(capObj, null, 2);
+    }
+
+    // Web Audio Synthesizer for Disaster Alert Sound (Non-intrusive NDMA Siren)
+    function toggleSirenSound() {
+      if (sirenPlaying) {
+        if (audioCtx) audioCtx.close();
+        audioCtx = null;
+        sirenPlaying = false;
+        return;
+      }
+
+      try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AudioContext();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.3);
+        osc.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.6);
+
+        gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.8);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.8);
+
+        sirenPlaying = true;
+        setTimeout(() => { sirenPlaying = false; }, 900);
+      } catch (err) {
+        console.log('AudioContext init requires user interaction:', err);
+      }
+    }
+
+    // System Log
+    function addLog(msg, type = 'info') {
+      const log = document.getElementById('systemLog');
+      const time = new Date().toLocaleTimeString('en-GB');
+      const line = document.createElement('div');
+      line.className = 'log-line';
+      line.innerHTML = `<span class="log-time">[${time}]</span><span class="log-msg ${type}">${msg}</span>`;
+      log.prepend(line);
+    }
+
+    // Scenario Presets for Judges
+    function loadScenario(type) {
+      document.querySelectorAll('.scenario-btn').forEach(b => b.classList.remove('active'));
+      event.currentTarget.classList.add('active');
+
+      if (type === 'dry') {
+        document.getElementById('sliderRain').value = 15;
+        document.getElementById('sliderSoil').value = 22;
+        onInputRain(15);
+        onInputSoil(22);
+        addLog("Loaded Scenario: Nominal Pre-Monsoon Dry baseline.", "info");
+      } else if (type === 'moderate') {
+        document.getElementById('sliderRain').value = 75;
+        document.getElementById('sliderSoil').value = 58;
+        onInputRain(75);
+        onInputSoil(58);
+        addLog("Loaded Scenario: Persistent monsoon seepage and elevated watch.", "warning");
+      } else if (type === 'cloudburst') {
+        document.getElementById('sliderRain').value = 180;
+        document.getElementById('sliderSoil').value = 88;
+        onInputRain(180);
+        onInputSoil(88);
+        addLog("Loaded Scenario: Catastrophic Cloudburst (>150mm/h). TTF < 4 hours.", "critical");
+      } else if (type === 'severance') {
+        toggleMeshFailure();
+      }
+    }
+
+    // Initialize on page load
+    window.addEventListener('load', () => {
+      resizeForecastCanvas();
+      resizeTerrainCanvas();
+      updateSystem();
+      setPitchPreset(60);
+
+      // Real-time clock update on phone
+      setInterval(() => {
+        const d = new Date();
+        document.getElementById('phoneClock').innerText = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      }, 1000);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,186 @@
+Here is a complete, simple breakdown of **every single file in the project**, what each piece of code does, and how they all work together like a well-oiled machine.
+
+---
+
+### How the Entire System Connects (The Big Picture)
+
+```
+ [User's Browser]
+       │
+       │  1. Loads HTML, CSS, & JavaScript
+       ▼
+ [frontend/index.html & style.css]  ◄── (Visual layout & dark styling)
+       │
+       │  2. User interacts (drags sliders, clicks zones)
+       ▼
+ [frontend/assets/app.js]           ◄── (Frontend Brain: calls APIs)
+       │
+       │  3. Sends HTTP requests (fetch /api/predict, /api/zones)
+       ▼
+ [backend/main.py]                  ◄── (Backend Brain: runs AI math & logic)
+       │
+       │  4. Returns JSON data (Score: 84, Level: "CRITICAL", Confidence: 92%)
+       ▼
+ [frontend/assets/app.js]           ◄── (Updates text, changes colors to red)
+       │
+       │  5. User sees live update on screen!
+       ▼
+ [User's Screen]
+```
+
+---
+
+## 1. Backend: [backend/main.py](file:///c:/Users/ayush/OneDrive/Desktop/Slope-Sentinel/backend/main.py)
+> **Role:** The **"Brain and Engine"** of the project.  
+> It does the math, calculates landslide risk, stores monitored zone data, and sends information to the browser.
+
+### Key Sections in this file:
+
+#### A. Setup & App Initialization (Lines 1–25)
+* **What it does:** Imports FastAPI, sets up CORS (Cross-Origin Resource Sharing), and configures the app.
+* **Role:** Allows the frontend webpage to securely communicate with the Python backend without getting blocked by browser security restrictions.
+
+#### B. The Input Data Schema: `RiskRequest` (Lines 27–34)
+```python
+class RiskRequest(BaseModel):
+    rainfall: float = Field(128, ge=0)
+    soil_moisture: float = Field(74, ge=0, le=100)
+    slope: float = Field(38, ge=0, le=90)
+    deformation: float = Field(7.2, ge=0)
+    historical_events: int = Field(4, ge=0)
+    data_reliability: float = Field(91, ge=0, le=100)
+```
+* **What it does:** Uses **Pydantic** to define the exact rules for what inputs the AI predictor needs (e.g., rainfall cannot be negative; soil moisture must be between 0 and 100%).
+* **Role:** Protects the backend from bad or corrupted inputs.
+
+#### C. The AI Risk Calculation Engine: `risk_score()` (Lines 35–52)
+```python
+def risk_score(x: RiskRequest):
+    rainfall = min(x.rainfall / 180, 1) * 28
+    soil = x.soil_moisture / 100 * 20
+    slope = min(x.slope / 55, 1) * 18
+    deformation = min(x.deformation / 15, 1) * 20
+    history = min(x.historical_events / 8, 1) * 9
+    raw = rainfall + soil + slope + deformation + history
+    confidence = max(42, min(99, 58 + x.data_reliability * .38 - abs(85 - x.data_reliability) * .12))
+```
+* **What it does:** 
+  1. Multiplies each environmental factor by its scientific weight (Rainfall = 28%, Soil = 20%, Ground Shift = 20%, Slope = 18%, Past Slides = 9%).
+  2. Calculates the **Risk Score** (0 to 100).
+  3. Classifies it into a threat category: **CRITICAL** ($\ge 70$), **HIGH** ($\ge 52$), **MODERATE** ($\ge 32$), or **LOW**.
+  4. Computes a **Confidence %** based on sensor health.
+* **Role:** This is the core decision-making algorithm that decides if a slope is safe or about to fail.
+
+#### D. REST API Endpoints (Lines 53–131)
+* **`/api/health`**: Reports if the server is running properly.
+* **`/api/overview`**: Sends overall numbers for the top dashboard cards (e.g., 18 active zones, 3 critical, 98.6% uptime).
+* **`/api/zones`**: Sends the list of monitored locations in Northeast India (Aizawl, Gangtok, Kohima, Tawang, Shillong, Imphal, etc.) with coordinates and danger levels.
+* **`/api/alerts`**: Sends the recent incident alerts feed.
+* **`/api/pipeline` & `/api/references`**: Sends the architecture steps and official sources (NDMA, ESA, GSI, IMD).
+* **`/api/predict`**: Accepts the slider numbers from the user, runs `risk_score()`, and sends back the score, risk level, confidence, and action advice (e.g., *"Immediate alert and evacuation readiness"*).
+
+#### E. Serving the Frontend (Lines 133–138)
+```python
+app.mount("/app", StaticFiles(directory=str(BASE / "frontend"), html=True), name="frontend")
+@app.get("/")
+def root():
+    return FileResponse(BASE / "frontend" / "index.html")
+```
+* **What it does:** Hosts the HTML, CSS, and JS directly from Python so the entire project runs as **one single integrated program** on `http://127.0.0.1:8000`.
+
+---
+
+## 2. Frontend Structure: [frontend/index.html](file:///c:/Users/ayush/OneDrive/Desktop/Slope-Sentinel/frontend/index.html)
+> **Role:** The **"Skeleton and Layout"** of the application.  
+> It defines all the buttons, cards, sliders, and views you see on screen.
+
+### Key Sections in this file:
+
+1. **Header & Topbar (Lines 13–20):**
+   * Displays the brand logo ("SLOPE SENTINEL"), a pulsing green status dot ("ALL SYSTEMS NOMINAL"), and the live digital clock.
+2. **Navigation Sidebar (Lines 23–32):**
+   * Contains the sidebar buttons to switch between the 7 views:
+     * ◈ Command Center
+     * ⌖ Risk Intelligence Map
+     * ✦ AI Risk Predictor
+     * ⌁ Data Pipeline
+     * ⬡ Resilience & Alerts
+     * ◌ Impact & Benefits
+     * ▤ Research & Sources
+3. **Overview Dashboard (Lines 35–71):**
+   * Shows the animated rotating orb, the 4 big metric cards (Active Zones, Critical Zones, High Risk, Data Reliability), the mini-map preview, and the live incident stream.
+4. **Interactive GIS Map (Lines 73–79):**
+   * Contains `#bigMap` (where the interactive radar map is drawn) and the list of monitored zones.
+5. **AI Risk Predictor (Lines 81–102):**
+   * The interactive testing laboratory: contains 6 HTML `<input type="range">` sliders (Rainfall, Soil Moisture, Slope, Deformation, History, Reliability) and the circular dial gauge that displays the output score.
+6. **Technical & Analytical Views (Lines 104–143):**
+   * Contains the cards detailing the data pipeline, feasibility analysis, stakeholder impact, and official research citations.
+
+---
+
+## 3. Frontend Logic: [frontend/assets/app.js](file:///c:/Users/ayush/OneDrive/Desktop/Slope-Sentinel/frontend/assets/app.js)
+> **Role:** The **"Nervous System"** of the frontend.  
+> It handles clicks, fetches data from the backend, updates the UI in real time, and controls animations.
+
+### Key Functions in this file:
+
+* **`api(path, options)` (Lines 4–8):**
+  * Helper function that uses JavaScript's `fetch()` to call the Python backend and convert the reply into usable JSON objects.
+* **`showView(id)` (Lines 9–16):**
+  * Switches between the 7 tabs without reloading the page. It hides the previous view and reveals the chosen one smoothly.
+* **`sync(el, id, suffix)` (Line 18):**
+  * When you drag a slider (e.g., rainfall), this immediately updates the number next to it in real time (e.g., `128 mm`).
+* **`load()` (Lines 21–29):**
+  * Runs automatically the moment the page opens. It calls `Promise.all` to fetch all data from `/api/overview`, `/api/zones`, `/api/alerts`, etc., in parallel and paints the screen with live information.
+* **`renderMiniMap()` & `renderBigMap()` (Lines 31–36):**
+  * Generates the SVG map graphic and calculates where to position each blinking colored pin for Aizawl, Gangtok, Kohima, etc.
+* **`col(l)` (Line 37):**
+  * Returns the right color code: `#ff5577` (Red for Critical), `#ff914d` (Orange for High), `#ffc857` (Yellow for Moderate), or `#6fffb0` (Mint Green for Low).
+* **`predict()` (Lines 44–51):**
+  * When you click **"RUN AI PREDICTION"**:
+    1. Grabs the values from all 6 sliders.
+    2. Packages them into a JSON payload.
+    3. Sends a `POST` request to `/api/predict`.
+    4. Updates the circular score ring, changes the badge color, animates the confidence bar, and prints the recommended safety action.
+
+---
+
+## 4. Frontend Styling: [frontend/assets/style.css](file:///c:/Users/ayush/OneDrive/Desktop/Slope-Sentinel/frontend/assets/style.css)
+> **Role:** The **"Visual Appearance and Design"**.  
+> Makes the application look like a high-tech, futuristic military-grade command center.
+
+### Key Design Elements:
+* **Color Palette:** Curated dark mode using forest charcoal (`#07100f`), glass panels (`#0b1715`), and glowing neon mint (`#6fffb0`).
+* **Glassmorphism:** Uses `backdrop-filter: blur(18px)` on the top navigation bar so content glides smoothly underneath it.
+* **Animations:**
+  * `@keyframes spin`: Rotates the 3 orbital rings around the AI core.
+  * `@keyframes pulse`: Creates the pulsing radar rings radiating outward from high-risk map pins.
+  * `@keyframes fade`: Creates smooth entrance transitions when switching tabs.
+* **Responsive Layout:** Automatically rearranges panels into single-column cards on tablets and smartphones so it works cleanly on mobile devices.
+
+---
+
+## 5. Startup & Environment Files
+
+### A. [requirements.txt](file:///c:/Users/ayush/OneDrive/Desktop/Slope-Sentinel/requirements.txt)
+> **Role:** Tells Python which third-party packages are needed.
+* **`fastapi`**: The web framework for building the APIs.
+* **`uvicorn`**: The high-speed server that runs FastAPI.
+* **`pydantic`**: Enforces data validation and typed schemas.
+
+### B. [run.bat](file:///c:/Users/ayush/OneDrive/Desktop/Slope-Sentinel/run.bat) (Windows) & [run.sh](file:///c:/Users/ayush/OneDrive/Desktop/Slope-Sentinel/run.sh) (Mac/Linux)
+> **Role:** **One-click launch scripts**.
+* Automatically detects your Python installation, installs `requirements.txt` if not already installed, and starts the server on `127.0.0.1:8000`.
+
+---
+
+## Summary Matrix: Who Does What?
+
+| File | Type | Primary Job | How It Interacts With Other Files |
+| :--- | :--- | :--- | :--- |
+| **[backend/main.py](file:///c:/Users/ayush/OneDrive/Desktop/Slope-Sentinel/backend/main.py)** | Python | API server + AI risk scoring engine | Receives requests from `app.js` and serves `index.html`. |
+| **[frontend/index.html](file:///c:/Users/ayush/OneDrive/Desktop/Slope-Sentinel/frontend/index.html)** | HTML | UI Structure & views layout | Loads `style.css` for looks and `app.js` for interactivity. |
+| **[frontend/assets/app.js](file:///c:/Users/ayush/OneDrive/Desktop/Slope-Sentinel/frontend/assets/app.js)** | JavaScript | Frontend reactivity & API client | Reads user actions from `index.html` and talks to `main.py`. |
+| **[frontend/assets/style.css](file:///c:/Users/ayush/OneDrive/Desktop/Slope-Sentinel/frontend/assets/style.css)** | CSS | Dark theme styling & animations | Styles all elements defined in `index.html`. |
+| **[requirements.txt](file:///c:/Users/ayush/OneDrive/Desktop/Slope-Sentinel/requirements.txt)** | Config | Dependency definition list | Read by `run.bat` / `run.sh` during setup. |
+| **[run.bat](file:///c:/Users/ayush/OneDrive/Desktop/Slope-Sentinel/run.bat)** | Batch script | Windows launcher automation | Installs dependencies and starts `main.py`. |

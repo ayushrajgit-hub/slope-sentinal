@@ -1,0 +1,191 @@
+.pipeline {
+  position: relative;
+}
+
+.pipeline__header {
+  text-align: center;
+  margin-bottom: var(--space-3xl);
+}
+
+.pipeline__header h2 {
+  margin-top: var(--space-md);
+  margin-bottom: var(--space-md);
+}
+
+.pipeline__subtitle {
+  max-width: 600px;
+  margin: 0 auto;
+  color: var(--text-secondary);
+}
+
+/* Card Grid */
+.pipeline__track {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-lg);
+  position: relative;
+}
+
+.pipeline__card {
+  text-align: center;
+  padding: var(--space-xl) var(--space-lg);
+  position: relative;
+  cursor: default;
+}
+
+.pipeline__card:hover {
+  border-color: var(--accent);
+  box-shadow: var(--shadow-glow);
+  transform: translateY(-8px);
+}
+
+/* Stage Number */
+.pipeline__card-num {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--accent-subtle);
+  border: 1.5px solid var(--border-accent);
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto var(--space-md);
+  transition: all var(--transition-base);
+}
+
+.pipeline__card:hover .pipeline__card-num {
+  background: var(--accent);
+  color: var(--bg-deep);
+  box-shadow: 0 0 16px var(--accent-glow);
+}
+
+/* Icon */
+.pipeline__card-icon {
+  width: 40px;
+  height: 40px;
+  margin: 0 auto var(--space-md);
+  color: var(--accent);
+  opacity: 0.7;
+  transition: opacity var(--transition-base);
+}
+
+.pipeline__card:hover .pipeline__card-icon {
+  opacity: 1;
+}
+
+.pipeline__card-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.pipeline__card-tag {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--accent);
+  background: var(--accent-subtle);
+  padding: 2px 8px;
+  border-radius: 4px;
+  margin-bottom: var(--space-sm);
+}
+
+/* Text */
+.pipeline__card-title {
+  font-size: 1.05rem;
+  margin-bottom: var(--space-sm);
+  color: var(--text-primary);
+}
+
+.pipeline__card-desc {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+/* Connector dots (desktop) */
+.pipeline__connector {
+  display: none;
+}
+
+@media (min-width: 1025px) {
+  .pipeline__connector {
+    display: block;
+    position: absolute;
+    right: -12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 8px;
+    height: 8px;
+    z-index: 2;
+  }
+
+  .pipeline__connector::before {
+    content: '→';
+    color: var(--text-muted);
+    font-size: 1rem;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  /* Hide connector on 4th and 8th card (end of rows) */
+  .pipeline__card:nth-child(4) .pipeline__connector,
+  .pipeline__card:nth-child(8) .pipeline__connector {
+    display: none;
+  }
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .pipeline__track {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .pipeline__connector {
+    display: block;
+    position: absolute;
+    right: -12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 8px;
+    height: 8px;
+    z-index: 2;
+  }
+
+  .pipeline__connector::before {
+    content: '→';
+    color: var(--text-muted);
+    font-size: 1rem;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .pipeline__card:nth-child(2) .pipeline__connector,
+  .pipeline__card:nth-child(4) .pipeline__connector,
+  .pipeline__card:nth-child(6) .pipeline__connector,
+  .pipeline__card:nth-child(8) .pipeline__connector {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .pipeline__track {
+    grid-template-columns: 1fr;
+    max-width: 420px;
+    margin: 0 auto;
+  }
+
+  .pipeline__connector {
+    display: none !important;
+  }
+}
