@@ -24,9 +24,45 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
       integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
       crossorigin="" />
+
+    <!-- Suppress Netlify Injected Widgets -->
+    <style>
+      netlify-drawer,
+      #netlify-drawer,
+      iframe#netlify-drawer,
+      iframe[title*="Netlify"],
+      [data-netlify-drawer],
+      .netlify-badge,
+      [class*="netlify"],
+      div[style*="fixed"][style*="bottom"]:has(a[href*="netlify.com"]),
+      a[href*="netlify.com"] {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+      }
+    </style>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
+    <script>
+      (function() {
+        function removeNetlifyBadge() {
+          const els = document.querySelectorAll(
+            'netlify-drawer, #netlify-drawer, iframe#netlify-drawer, iframe[title*="Netlify"], [data-netlify-drawer], .netlify-badge, [class*="netlify-badge"], [class*="netlify"]'
+          );
+          els.forEach(el => el.remove());
+          document.querySelectorAll('a[href*="netlify.com"]').forEach(a => {
+            const box = a.closest('div[style*="fixed"]') || a;
+            box.remove();
+          });
+        }
+        window.addEventListener('DOMContentLoaded', removeNetlifyBadge);
+        window.addEventListener('load', removeNetlifyBadge);
+        const timer = setInterval(removeNetlifyBadge, 250);
+        setTimeout(() => clearInterval(timer), 10000);
+      })();
+    </script>
   </body>
 </html>
