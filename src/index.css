@@ -396,3 +396,20 @@ p {
     padding: 0 var(--space-md);
   }
 }
+
+/* ---------- Suppress Netlify Injected Badge & Drawer ---------- */
+#netlify-drawer,
+iframe#netlify-drawer,
+[data-netlify-drawer],
+.netlify-badge,
+[class*="netlify-badge"],
+[class*="NetlifyBadge"],
+div[class*="netlify-feedback"],
+div[style*="fixed"][style*="bottom"]:has(a[href*="netlify.com"]),
+a[href*="netlify.com"][class*="badge"],
+body > div:has(a[href*="netlify.com"]) {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
